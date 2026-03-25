@@ -987,6 +987,41 @@
       }
     }
 
+
+    /* --- TRABALHISTA CSS --- */
+    details.form-section-details { background:var(--white); border:1.5px solid rgba(201,148,58,.25); border-radius:var(--radius); margin-bottom:14px; overflow:hidden; }
+    details.form-section-details[open] summary::after { transform:rotate(180deg); }
+    details.form-section-details summary { display:flex; align-items:center; justify-content:space-between; padding:13px 16px; cursor:pointer; list-style:none; font-size:12px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--amber); background:var(--amber-pale); user-select:none; }
+    details.form-section-details summary::-webkit-details-marker { display:none; }
+    details.form-section-details summary::after { content:"\25be"; font-size:16px; color:var(--amber); transition:transform .2s; }
+    .details-body { padding:16px 16px 18px; display:flex; flex-direction:column; gap:14px; }
+    .form-section-plain { margin-bottom:14px; }
+    .form-section-title { font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--text-sec); margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid rgba(201,148,58,.2); }
+    .tipo-parte-toggle { display:flex; gap:8px; margin-bottom:12px; }
+    .tipo-parte-btn { flex:1; padding:7px 10px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; border:1.5px solid rgba(201,148,58,.3); border-radius:var(--radius); background:var(--linen); color:var(--text-sec); cursor:pointer; transition:all .15s; text-align:center; }
+    .tipo-parte-btn.active { background:var(--amber); border-color:var(--amber); color:#fff; font-weight:600; }
+    .valor-input-wrap { position:relative; }
+    .valor-input-wrap .valor-prefix { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:14px; font-weight:500; color:var(--text-sec); pointer-events:none; }
+    .valor-input-wrap input { padding-left:32px; }
+    .pedidos-list { display:flex; flex-direction:column; gap:8px; }
+    .pedido-item { display:flex; gap:8px; align-items:center; }
+    .pedido-item input { flex:1; }
+    .pedido-num { font-size:12px; font-weight:600; color:var(--amber); min-width:18px; text-align:right; flex-shrink:0; }
+    .btn-pedido-action { width:30px; height:38px; border:1.5px solid rgba(201,148,58,.35); border-radius:var(--radius); background:var(--linen); color:var(--amber); font-size:18px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
+    .btn-pedido-action:hover { background:var(--amber); color:#fff; border-color:var(--amber); }
+    .upload-zone-trab { border:2px dashed rgba(201,148,58,.35); border-radius:var(--radius); padding:18px; text-align:center; background:var(--linen); cursor:pointer; transition:border-color .2s; }
+    .upload-zone-trab:hover { border-color:var(--amber); }
+    .upload-zone-trab .upload-icon { font-size:24px; margin-bottom:4px; }
+    .upload-zone-trab .upload-text { font-size:13px; color:var(--text-sec); }
+    .upload-zone-trab .upload-text strong { color:var(--amber); }
+    .upload-zone-trab .upload-hint { font-size:11px; color:var(--text-sec); margin-top:3px; }
+    .field-wrap select { font-family:'DM Sans',sans-serif; font-size:14px; padding:10px 32px 10px 12px; border:1.5px solid rgba(0,0,0,.12); border-radius:var(--radius); background:var(--white); color:var(--text); outline:none; transition:border-color .15s; appearance:none; cursor:pointer; width:100%; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23C9943A' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
+    .field-wrap select:focus { border-color:var(--amber); }
+    .radio-group-inline { display:flex; gap:20px; padding:10px 0 2px; align-items:center; }
+    .radio-group-inline label { display:flex; align-items:center; gap:6px; font-size:14px; color:var(--text); cursor:pointer; font-weight:400; }
+    .radio-group-inline input[type="radio"] { accent-color:var(--amber); width:15px; height:15px; }
+    #form-trabalhista { opacity:0; pointer-events:none; transform:translateY(8px); transition:opacity .25s,transform .25s; }
+    #form-trabalhista.visible { opacity:1; pointer-events:all; transform:translateY(0); }
     /* ─── UTILIDADES ───────────────────────────────────────────── */
     .hidden { display: none !important; }
   </style>
@@ -1054,9 +1089,9 @@
 
         <!-- Grid de tipos -->
         <div class="tipos-grid" id="tipos-grid">
-          <div class="tipo-card" data-tipo="Petição Inicial Trabalhista" tabindex="0">
+          <div class="tipo-card" data-tipo="Inicial Trabalhista" tabindex="0">
             <span class="tipo-card-icon">⚖️</span>
-            <div class="tipo-card-nome">Petição Inicial Trabalhista</div>
+            <div class="tipo-card-nome">Inicial Trabalhista</div>
             <div class="tipo-card-desc">Reclamação na Justiça do Trabalho</div>
           </div>
           <div class="tipo-card" data-tipo="Recurso Ordinário" tabindex="0">
@@ -1143,6 +1178,140 @@
 
           <div class="form-actions">
             <button class="btn-primary" id="btn-gerar">Gerar petição →</button>
+          </div>
+        </div>
+
+        <div id="form-trabalhista">
+          <details class="form-section-details" open>
+            <summary>Qualificação do Cliente</summary>
+            <div class="details-body">
+              <div class="form-row">
+                <div class="field-wrap">
+                  <label for="t-nome">Nome completo *</label>
+                  <input type="text" id="t-nome" placeholder="Ex.: Maria Santos da Silva" />
+                  <span class="field-error" id="t-erro-nome">Informe o nome do cliente.</span>
+                </div>
+                <div class="field-wrap">
+                  <label for="t-estado-civil">Estado Civil</label>
+                  <select id="t-estado-civil"><option value="" disabled selected>Selecione…</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option></select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field-wrap">
+                  <label for="t-profissao">Profissão</label>
+                  <input type="text" id="t-profissao" placeholder="Ex.: Auxiliar Administrativo" />
+                </div>
+                <div class="field-wrap">
+                  <label for="t-cpf">CPF *</label>
+                  <input type="text" id="t-cpf" placeholder="000.000.000-00" maxlength="14" />
+                  <span class="field-error" id="t-erro-cpf">Informe o CPF.</span>
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="field-wrap">
+                  <label for="t-endereco">Endereço</label>
+                  <input type="text" id="t-endereco" placeholder="Rua, nº, complemento, cidade — UF" />
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details class="form-section-details" open>
+            <summary>Qualificação da Parte Contrária</summary>
+            <div class="details-body">
+              <div class="tipo-parte-toggle">
+                <button class="tipo-parte-btn active" id="t-btn-pf" type="button">Pessoa Física</button>
+                <button class="tipo-parte-btn" id="t-btn-pj" type="button">Pessoa Jurídica</button>
+              </div>
+              <div class="form-row">
+                <div class="field-wrap">
+                  <label id="t-label-contra-nome">Nome completo</label>
+                  <input type="text" id="t-contra-nome" placeholder="Nome da pessoa ou empresa" />
+                </div>
+                <div class="field-wrap" id="t-wrap-contra-ec">
+                  <label>Estado Civil</label>
+                  <select id="t-contra-estado-civil"><option value="" disabled selected>Selecione…</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option></select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field-wrap">
+                  <label id="t-label-contra-doc">CPF</label>
+                  <input type="text" id="t-contra-doc" placeholder="000.000.000-00" maxlength="18" />
+                </div>
+                <div class="field-wrap">
+                  <label for="t-contra-endereco">Endereço</label>
+                  <input type="text" id="t-contra-endereco" placeholder="Rua, nº, complemento, cidade — UF" />
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="field-wrap">
+                  <label for="t-vara">Vara / Foro</label>
+                  <input type="text" id="t-vara" placeholder="Ex.: 3ª Vara do Trabalho de SP" />
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <div class="form-section-plain">
+            <div class="form-section-title">Fundamentação</div>
+            <div class="form-row single" style="margin-bottom:14px">
+              <div class="field-wrap">
+                <label for="t-fatos">Fatos do caso *</label>
+                <textarea id="t-fatos" rows="5" placeholder="Descreva os fatos relevantes…"></textarea>
+                <span class="field-error" id="t-erro-fatos">Descreva os fatos do caso.</span>
+              </div>
+            </div>
+            <div class="form-row single">
+              <div class="field-wrap">
+                <label for="t-fundamentos">Fundamentos Jurídicos</label>
+                <textarea id="t-fundamentos" rows="3" placeholder="Ex.: Art. 7º CF, CLT art. 483…"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section-plain">
+            <div class="form-section-title">Pedido</div>
+            <div class="field-wrap" style="margin-bottom:14px">
+              <label>Pedido(s) principal(is) *</label>
+              <div class="pedidos-list" id="t-pedidos-list">
+                <div class="pedido-item">
+                  <span class="pedido-num">1.</span>
+                  <input type="text" placeholder="Ex.: Pagamento de horas extras" />
+                  <button class="btn-pedido-action" type="button" id="btn-add-pedido" title="Adicionar">+</button>
+                </div>
+              </div>
+              <span class="field-error" id="t-erro-pedido">Informe ao menos um pedido.</span>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap">
+                <label>Requer Audiência de Conciliação?</label>
+                <div class="radio-group-inline">
+                  <label><input type="radio" name="t-audiencia" value="sim" checked /> Sim</label>
+                  <label><input type="radio" name="t-audiencia" value="nao" /> Não</label>
+                </div>
+              </div>
+              <div class="field-wrap">
+                <label for="t-valor">Valor da causa</label>
+                <div class="valor-input-wrap">
+                  <span class="valor-prefix">R$</span>
+                  <input type="text" id="t-valor" placeholder="0,00" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section-plain">
+            <div class="form-section-title">Documentos</div>
+            <div class="upload-zone-trab" id="t-upload-zone">
+              <div class="upload-icon">&#128206;</div>
+              <div class="upload-text" id="t-upload-text"><strong>Clique para anexar</strong> ou arraste os arquivos</div>
+              <div class="upload-hint">PDF, DOCX, JPG, PNG — múltiplos arquivos permitidos</div>
+            </div>
+            <input type="file" id="t-upload" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display:none" />
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-primary" id="btn-gerar-trab">Gerar petição →</button>
           </div>
         </div>
       </section>
@@ -1300,9 +1469,10 @@
     document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
     card.classList.add('selected');
     tipoSelecionado = card.dataset.tipo;
-    formFields.classList.add('visible');
-    // Scroll suave até o formulário
-    formFields.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    var isTrab = tipoSelecionado === 'Inicial Trabalhista';
+    formFields.classList.toggle('visible', !isTrab);
+    document.getElementById('form-trabalhista').classList.toggle('visible', isTrab);
+    (isTrab ? document.getElementById('form-trabalhista') : formFields).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 
   // Suporte a teclado
@@ -1432,6 +1602,10 @@
     ['campo-nome','campo-fatos','campo-pedido'].forEach(id => $(id).classList.remove('error'));
     ['erro-nome','erro-fatos','erro-pedido'].forEach(id => $(id).classList.remove('visible'));
     formFields.classList.remove('visible');
+    var ftEl = document.getElementById('form-trabalhista'); if(ftEl) ftEl.classList.remove('visible');
+    ['t-nome','t-cpf','t-profissao','t-endereco','t-contra-nome','t-contra-doc','t-contra-endereco','t-vara','t-fatos','t-fundamentos','t-valor'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    ['t-estado-civil','t-contra-estado-civil'].forEach(function(id){var el=document.getElementById(id);if(el)el.selectedIndex=0;});
+    var pl=document.getElementById('t-pedidos-list');if(pl){pl.querySelectorAll('.pedido-item:not(:first-child)').forEach(function(el){el.remove();});var fi=pl.querySelector('input[type=text]');if(fi)fi.value='';}
     resetChat();
     showScreen('form');
   });
@@ -2157,6 +2331,119 @@
   ───────────────────────────────────────────────────────────── */
   showScreen('form');
   renderBiblioteca();
+
+  /* === TRABALHISTA JS === */
+  var tipoParte = 'pf';
+  function setTipoParte(tipo) {
+    tipoParte = tipo;
+    var isPF = tipo === 'pf';
+    document.getElementById('t-btn-pf').classList.toggle('active', isPF);
+    document.getElementById('t-btn-pj').classList.toggle('active', !isPF);
+    var ecWrap = document.getElementById('t-wrap-contra-ec');
+    if (ecWrap) ecWrap.classList.toggle('hidden', !isPF);
+    document.getElementById('t-label-contra-nome').textContent = isPF ? 'Nome completo' : 'Raz\u00e3o Social';
+    var lDoc = document.getElementById('t-label-contra-doc');
+    var iDoc = document.getElementById('t-contra-doc');
+    if (isPF) { lDoc.textContent = 'CPF'; iDoc.placeholder = '000.000.000-00'; iDoc.maxLength = 14; }
+    else { lDoc.textContent = 'CNPJ'; iDoc.placeholder = '00.000.000/0000-00'; iDoc.maxLength = 18; iDoc.value = ''; }
+  }
+  document.getElementById('t-btn-pf').addEventListener('click', function(){ setTipoParte('pf'); });
+  document.getElementById('t-btn-pj').addEventListener('click', function(){ setTipoParte('pj'); });
+
+  function maskCPF(v) {
+    v = v.replace(/\\D/g,'').slice(0,11);
+    if(v.length>9) v=v.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{1,2})/,'$1.$2.$3-$4');
+    else if(v.length>6) v=v.replace(/(\\d{3})(\\d{3})(\\d{1,3})/,'$1.$2.$3');
+    else if(v.length>3) v=v.replace(/(\\d{3})(\\d{1,3})/,'$1.$2');
+    return v;
+  }
+  function maskCNPJ(v) {
+    v = v.replace(/\\D/g,'').slice(0,14);
+    if(v.length>12) v=v.replace(/(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{1,2})/,'$1.$2.$3/$4-$5');
+    else if(v.length>8) v=v.replace(/(\\d{2})(\\d{3})(\\d{3})(\\d{1,4})/,'$1.$2.$3/$4');
+    else if(v.length>5) v=v.replace(/(\\d{2})(\\d{3})(\\d{1,3})/,'$1.$2.$3');
+    else if(v.length>2) v=v.replace(/(\\d{2})(\\d{1,3})/,'$1.$2');
+    return v;
+  }
+  document.getElementById('t-cpf').addEventListener('input', function(){ this.value = maskCPF(this.value); });
+  document.getElementById('t-contra-doc').addEventListener('input', function(){ this.value = tipoParte==='pf' ? maskCPF(this.value) : maskCNPJ(this.value); });
+  document.getElementById('t-valor').addEventListener('input', function(){
+    var v = this.value.replace(/\\D/g,'');
+    if(!v){ this.value=''; return; }
+    v = (parseInt(v,10)/100).toFixed(2);
+    this.value = v.replace('.',',').replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');
+  });
+
+  function addPedido() {
+    var list = document.getElementById('t-pedidos-list');
+    var num = list.querySelectorAll('.pedido-item').length + 1;
+    var div = document.createElement('div');
+    div.className = 'pedido-item';
+    div.innerHTML = '<span class="pedido-num">'+num+'.</span><input type="text" placeholder="Descreva o pedido\u2026" /><button class="btn-pedido-action" type="button" title="Remover">\u00d7</button>';
+    div.querySelector('button').addEventListener('click', function(){
+      div.remove();
+      document.getElementById('t-pedidos-list').querySelectorAll('.pedido-item').forEach(function(el,i){ el.querySelector('.pedido-num').textContent=(i+1)+'.'; });
+    });
+    list.appendChild(div);
+    div.querySelector('input').focus();
+  }
+  document.getElementById('btn-add-pedido').addEventListener('click', addPedido);
+  document.getElementById('t-upload-zone').addEventListener('click', function(){ document.getElementById('t-upload').click(); });
+  document.getElementById('t-upload').addEventListener('change', function(){
+    document.getElementById('t-upload-text').innerHTML = this.files.length
+      ? '<strong>'+this.files.length+' arquivo(s) selecionado(s)</strong>'
+      : '<strong>Clique para anexar</strong> ou arraste os arquivos';
+  });
+  ['t-nome','t-cpf','t-fatos'].forEach(function(id){ document.getElementById(id).addEventListener('input', function(){ this.classList.remove('error'); }); });
+
+  function validarTrab() {
+    var ok=true;
+    [['t-nome','t-erro-nome'],['t-cpf','t-erro-cpf'],['t-fatos','t-erro-fatos']].forEach(function(pair){
+      var el=document.getElementById(pair[0]), er=document.getElementById(pair[1]);
+      if(!el.value.trim()){el.classList.add('error');er.classList.add('visible');ok=false;}
+      else{el.classList.remove('error');er.classList.remove('visible');}
+    });
+    var peds=Array.from(document.getElementById('t-pedidos-list').querySelectorAll('input[type=text]')).map(function(i){return i.value.trim();}).filter(Boolean);
+    var erP=document.getElementById('t-erro-pedido');
+    if(!peds.length){erP.classList.add('visible');ok=false;}else{erP.classList.remove('visible');}
+    return ok;
+  }
+
+  document.getElementById('btn-gerar-trab').addEventListener('click', async function(){
+    if(!tipoSelecionado||!validarTrab()) return;
+    var peds=Array.from(document.getElementById('t-pedidos-list').querySelectorAll('input[type=text]')).map(function(inp,i){return(i+1)+'. '+inp.value.trim();}).filter(function(p){return p.length>3;}).join('\\n');
+    var aud=document.querySelector('input[name="t-audiencia"]:checked');
+    dadosAtivos={
+      tipo:tipoSelecionado,
+      nome:document.getElementById('t-nome').value.trim(),
+      cpf:document.getElementById('t-cpf').value.trim(),
+      estadoCivil:document.getElementById('t-estado-civil').value,
+      profissao:document.getElementById('t-profissao').value.trim(),
+      enderecoCliente:document.getElementById('t-endereco').value.trim(),
+      tipoParte:tipoParte,
+      contra:document.getElementById('t-contra-nome').value.trim(),
+      contraEstadoCivil:tipoParte==='pf'?document.getElementById('t-contra-estado-civil').value:'',
+      contraDoc:document.getElementById('t-contra-doc').value.trim(),
+      contraEndereco:document.getElementById('t-contra-endereco').value.trim(),
+      vara:document.getElementById('t-vara').value.trim(),
+      fatos:document.getElementById('t-fatos').value.trim(),
+      fundamentosJuridicos:document.getElementById('t-fundamentos').value.trim(),
+      pedido:peds,
+      audienciaConciliacao:aud?aud.value:'sim',
+      valor:document.getElementById('t-valor').value.trim(),
+    };
+    var btn=document.getElementById('btn-gerar-trab');
+    btn.disabled=true; btn.textContent='Gerando\u2026';
+    showScreen('loading');
+    try{
+      var resp=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(dadosAtivos)});
+      var data=await resp.json();
+      if(data.peticao){textoAtivo=data.peticao;salvarHistorico(dadosAtivos,textoAtivo);}
+      else{textoAtivo=data.erro||'Erro ao gerar. Tente novamente.';}
+    }catch(e){textoAtivo='Erro de conex\u00e3o.';}
+    exibirResultado(dadosAtivos,textoAtivo);
+    btn.disabled=false; btn.textContent='Gerar peti\u00e7\u00e3o \u2192';
+  });
 </script>
 </body>
 </html>

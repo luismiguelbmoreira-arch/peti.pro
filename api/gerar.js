@@ -155,21 +155,50 @@ module.exports = async function handler(req, res) {
       tipo   = '',
       nome   = '',
       cpf    = '',
+      estadoCivil = '',
+      profissao = '',
+      enderecoCliente = '',
+      tipoParte = '',
       contra = '',
+      contraEstadoCivil = '',
+      contraDoc = '',
+      contraEndereco = '',
       vara   = '',
       fatos  = '',
+      fundamentosJuridicos = '',
       pedido = '',
+      audienciaConciliacao = '',
       valor  = '',
     } = body;
 
+    // Monta qualificação completa se campos trabalhistas presentes
+    const qualCliente = [
+      nome,
+      estadoCivil ? `estado civil: ${estadoCivil}` : '',
+      profissao ? `profissão: ${profissao}` : '',
+      cpf ? `CPF: ${cpf}` : '',
+      enderecoCliente ? `endereço: ${enderecoCliente}` : '',
+    ].filter(Boolean).join(', ');
+
+    const tipoContra = tipoParte === 'pj' ? 'Pessoa Jurídica' : 'Pessoa Física';
+    const qualContra = [
+      contra || 'não informado',
+      tipoParte ? `(${tipoContra})` : '',
+      contraEstadoCivil ? `estado civil: ${contraEstadoCivil}` : '',
+      contraDoc ? `CPF/CNPJ: ${contraDoc}` : '',
+      contraEndereco ? `endereço: ${contraEndereco}` : '',
+    ].filter(Boolean).join(', ');
+
     const userPrompt = `
 Tipo de petição: ${tipo}
-Cliente: ${nome}${cpf ? ` (CPF: ${cpf})` : ''}
-Parte contrária: ${contra || 'não informado'}
+Cliente: ${qualCliente}
+Parte contrária: ${qualContra}
 Vara / Foro: ${vara || 'não informado'}
+${audienciaConciliacao ? `Requer audiência de conciliação: ${audienciaConciliacao === 'sim' ? 'Sim' : 'Não'}` : ''}
 
 FATOS:
 ${fatos}
+${fundamentosJuridicos ? `\nFUNDAMENTOS JURÍDICOS INDICADOS PELO ADVOGADO:\n${fundamentosJuridicos}` : ''}
 
 PEDIDO:
 ${pedido}

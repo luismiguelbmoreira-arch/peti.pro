@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Peti.PRO — Petições em segundos</title>
-  <meta name="description" content="Gere petições jurídicas completas em segundos com inteligência artificial. Peti.PRO, um produto da Conecte.se." />
+  <meta name="description" content="Gere petições jurídicas completas em segundos com inteligência artificial. Peti.PRO." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -23,7 +23,7 @@
       --green:    #3D6B45;
       --linen:    #FAF0E0;
       --linen-dark: #f0e0cc;
-      --text:     #1C1C1C;
+      --text:      #1C1C1C;
       --text-sec: #6B6B6B;
       --white:    #ffffff;
       --red-soft: #c0392b;
@@ -40,2410 +40,423 @@
     }
 
     /* ─── LAYOUT ───────────────────────────────────────────────── */
-    .app {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+    .app { display: flex; flex-direction: column; min-height: 100vh; }
 
-    /* ─── HEADER ───────────────────────────────────────────────── */
     .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 32px;
-      height: 64px;
-      background: var(--linen);
-      border-bottom: 1px solid var(--amber);
-      flex-shrink: 0;
-      position: relative;
-      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 64px; background: var(--linen);
+      border-bottom: 1px solid var(--amber); flex-shrink: 0;
+      position: relative; z-index: 100;
     }
 
     .logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--amber);
-      letter-spacing: -0.5px;
-    }
-
-    .tagline {
-      font-size: 14px;
-      color: var(--text-sec);
-      font-weight: 400;
+      font-family: 'Playfair Display', serif; font-size: 28px;
+      font-weight: 700; color: var(--amber); letter-spacing: -0.5px;
     }
 
     .hamburger {
-      display: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      flex-direction: column;
-      gap: 5px;
+      display: none; background: none; border: none; cursor: pointer;
+      padding: 8px; flex-direction: column; gap: 5px;
     }
 
     .hamburger span {
-      display: block;
-      width: 22px;
-      height: 2px;
-      background: var(--text);
-      border-radius: 2px;
-      transition: all 0.2s ease;
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 2px;
     }
 
-    /* ─── BODY ROW ─────────────────────────────────────────────── */
-    .body-row {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
+    .body-row { display: flex; flex: 1; overflow: hidden; }
 
     /* ─── SIDEBAR ──────────────────────────────────────────────── */
     .sidebar {
-      width: var(--sidebar-w);
-      background: var(--linen-dark);
+      width: var(--sidebar-w); background: var(--linen-dark);
       border-right: 1px solid rgba(201,148,58,0.2);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      overflow: hidden;
-      transition: transform 0.25s ease;
+      display: flex; flex-direction: column; flex-shrink: 0;
+      overflow: hidden; transition: transform 0.25s ease;
     }
 
-    .sidebar-top {
-      padding: 20px 16px 0;
-      flex-shrink: 0;
-    }
-
-    .sidebar-title-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .sidebar-title {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      color: var(--text-sec);
-    }
-
-    .sidebar-counter {
-      font-size: 11px;
-      color: var(--text-sec);
-      font-weight: 400;
-    }
+    .sidebar-top { padding: 20px 16px 0; flex-shrink: 0; }
+    .sidebar-title-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+    .sidebar-title { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-sec); }
+    .sidebar-counter { font-size: 11px; color: var(--text-sec); }
 
     .sidebar-search {
-      width: 100%;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      padding: 7px 10px;
-      border: 1.5px solid rgba(201,148,58,0.25);
-      border-radius: var(--radius);
-      background: var(--linen);
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.15s ease;
-      margin-bottom: 12px;
+      width: 100%; font-family: inherit; font-size: 12px; padding: 7px 10px;
+      border: 1.5px solid rgba(201,148,58,0.25); border-radius: var(--radius);
+      background: var(--linen); color: var(--text); outline: none; margin-bottom: 12px;
     }
 
-    .sidebar-search:focus { border-color: var(--amber); }
-    .sidebar-search::placeholder { color: var(--text-sec); }
-
-    .sidebar-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0 12px 8px;
-    }
-
-    .sidebar-empty {
-      font-size: 13px;
-      color: var(--text-sec);
-      text-align: center;
-      padding: 28px 12px 12px;
-      line-height: 1.7;
-    }
-
-    .sidebar-empty-link {
-      display: inline-block;
-      margin-top: 4px;
-      font-size: 12px;
-      color: var(--amber);
-      cursor: pointer;
-      text-decoration: none;
-      font-weight: 500;
-      transition: opacity 0.15s ease;
-    }
-
-    .sidebar-empty-link:hover { opacity: 0.75; }
-
+    .sidebar-list { flex: 1; overflow-y: auto; padding: 0 12px 8px; }
     .sidebar-item {
-      position: relative;
-      padding: 10px 8px;
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: background 0.15s ease;
-      margin-bottom: 2px;
+      position: relative; padding: 10px 8px; border-radius: var(--radius);
+      cursor: pointer; transition: background 0.15s ease; margin-bottom: 2px;
     }
-
     .sidebar-item:hover { background: rgba(201,148,58,0.12); }
-
-    .sidebar-item-type {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--amber);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      padding-right: 18px;
-    }
-
-    .sidebar-item-name {
-      font-size: 12px;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-top: 2px;
-    }
-
-    .sidebar-item-date {
-      font-size: 11px;
-      color: var(--text-sec);
-      margin-top: 2px;
-    }
+    .sidebar-item-type { font-size: 12px; font-weight: 600; color: var(--amber); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sidebar-item-name { font-size: 12px; color: var(--text); margin-top: 2px; }
 
     .btn-item-delete {
-      position: absolute;
-      top: 8px;
-      right: 6px;
-      background: none;
-      border: none;
-      font-size: 13px;
-      color: var(--text-sec);
-      cursor: pointer;
-      line-height: 1;
-      padding: 2px 4px;
-      border-radius: 3px;
-      opacity: 0;
-      transition: opacity 0.15s ease, color 0.15s ease;
+      position: absolute; top: 8px; right: 6px; background: none; border: none;
+      font-size: 13px; color: var(--text-sec); cursor: pointer; opacity: 0;
     }
-
     .sidebar-item:hover .btn-item-delete { opacity: 1; }
-    .btn-item-delete:hover { color: var(--red-soft); }
 
-    .item-delete-confirm {
-      display: none;
-      background: var(--linen);
-      border: 1px solid rgba(201,148,58,0.2);
-      border-radius: var(--radius);
-      padding: 8px 10px;
-      margin: 4px 0 6px;
-      font-size: 11px;
-      color: var(--text-sec);
-      text-align: center;
-    }
-
-    .item-delete-confirm.visible { display: block; }
-
-    .item-delete-confirm-btns {
-      display: flex;
-      gap: 6px;
-      margin-top: 6px;
-    }
-
-    .item-delete-confirm-btns button {
-      flex: 1;
-      padding: 4px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      border: 1px solid;
-      transition: all 0.15s ease;
-    }
-
-    .sidebar-footer {
-      padding: 12px;
-      border-top: 1px solid rgba(201,148,58,0.15);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .sidebar-export-row {
-      display: flex;
-      gap: 6px;
-    }
-
-    .btn-sidebar {
-      flex: 1;
-      background: none;
-      border: 1px solid rgba(201,148,58,0.3);
-      border-radius: var(--radius);
-      padding: 7px 4px;
-      font-size: 11px;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text-sec);
-      cursor: pointer;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-    }
-
-    .btn-sidebar:hover { border-color: var(--amber); color: var(--amber); }
-
-    .btn-clear {
-      width: 100%;
-      background: none;
-      border: 1px solid rgba(201,148,58,0.2);
-      border-radius: var(--radius);
-      padding: 7px;
-      font-size: 11px;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text-sec);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .btn-clear:hover { border-color: var(--red-soft); color: var(--red-soft); }
-
-    .clear-confirm {
-      display: none;
-      font-size: 11px;
-      color: var(--text-sec);
-      text-align: center;
-    }
-
-    .clear-confirm.visible { display: block; }
-
-    .clear-confirm-btns {
-      display: flex;
-      gap: 6px;
-      margin-top: 6px;
-    }
-
-    .clear-confirm-btns button {
-      flex: 1;
-      padding: 5px 4px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      border: 1px solid;
-      transition: all 0.15s ease;
-    }
-
-    .btn-confirm-yes {
-      background: var(--red-soft);
-      border-color: var(--red-soft) !important;
-      color: white;
-    }
-
-    .btn-confirm-no {
-      background: none;
-      border-color: rgba(0,0,0,0.15) !important;
-      color: var(--text-sec);
-    }
+    .sidebar-footer { padding: 12px; border-top: 1px solid rgba(201,148,58,0.15); display: flex; flex-direction: column; gap: 6px; }
+    .sidebar-export-row { display: flex; gap: 6px; }
+    .btn-sidebar { flex: 1; background: none; border: 1px solid rgba(201,148,58,0.3); border-radius: var(--radius); padding: 7px 4px; font-size: 11px; cursor: pointer; }
 
     /* ─── MAIN ─────────────────────────────────────────────────── */
-    .main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 48px 56px;
-    }
+    .main { flex: 1; overflow-y: auto; padding: 48px 56px; }
+    #screen-form { max-width: 760px; }
+    .screen-title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; margin-bottom: 32px; }
 
-    /* ─── TELA 1: FORMULÁRIO ───────────────────────────────────── */
-    #screen-form {
-      max-width: 760px;
-    }
-
-    .screen-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 32px;
-    }
-
-    /* Cards de tipo */
-    .tipos-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 36px;
-    }
-
+    .tipos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 36px; }
     .tipo-card {
-      border: 1.5px solid rgba(201,148,58,0.2);
-      border-radius: var(--radius);
-      padding: 16px 14px;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      background: var(--linen);
+      border: 1.5px solid rgba(201,148,58,0.2); border-radius: var(--radius);
+      padding: 16px 14px; cursor: pointer; transition: all 0.18s ease; background: var(--linen);
     }
+    .tipo-card:hover, .tipo-card.selected { border-color: var(--amber); background: var(--amber-pale); }
+    .tipo-card.selected { border-width: 2px; }
 
-    .tipo-card:hover {
-      border-color: var(--amber);
-      background: var(--amber-pale);
+    .form-fields, #form-trabalhista { display: none; }
+    .form-fields.visible, #form-trabalhista.visible { display: block; animation: fadeIn 0.3s ease forwards; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-row.single { grid-template-columns: 1fr; }
+    .field-wrap { display: flex; flex-direction: column; gap: 5px; }
+    .field-wrap label { font-size: 13px; font-weight: 500; }
+    .field-wrap input, .field-wrap textarea, .field-wrap select {
+      font-family: inherit; font-size: 14px; padding: 10px 12px;
+      border: 1.5px solid rgba(0,0,0,0.12); border-radius: var(--radius); outline: none;
     }
-
-    .tipo-card.selected {
-      border-color: var(--amber);
-      border-width: 2px;
-      background: var(--amber-pale);
-    }
-
-    .tipo-card-icon {
-      font-size: 18px;
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    .tipo-card-nome {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.3;
-      margin-bottom: 4px;
-    }
-
-    .tipo-card-desc {
-      font-size: 11px;
-      color: var(--text-sec);
-      line-height: 1.4;
-    }
-
-    /* Formulário */
-    .form-fields {
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 0.25s ease, transform 0.25s ease;
-    }
-
-    .form-fields.visible {
-      opacity: 1;
-      pointer-events: all;
-      transform: translateY(0);
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
-    .form-row.single {
-      grid-template-columns: 1fr;
-    }
-
-    .field-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .field-wrap label {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    .field-wrap input,
-    .field-wrap textarea {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      padding: 10px 12px;
-      border: 1.5px solid rgba(0,0,0,0.12);
-      border-radius: var(--radius);
-      background: var(--white);
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.15s ease;
-      resize: vertical;
-    }
-
-    .field-wrap input:focus,
-    .field-wrap textarea:focus {
-      border-color: var(--amber);
-    }
-
-    .field-wrap input.error,
-    .field-wrap textarea.error {
-      border-color: var(--red-soft);
-    }
-
-    .field-error {
-      font-size: 12px;
-      color: var(--red-soft);
-      display: none;
-    }
-
+    .field-wrap input:focus { border-color: var(--amber); }
+    .field-error { font-size: 12px; color: var(--red-soft); display: none; }
     .field-error.visible { display: block; }
 
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 24px;
-    }
-
     /* ─── BOTÕES ───────────────────────────────────────────────── */
-    .btn-primary {
-      background: var(--amber);
-      color: var(--white);
-      border: none;
-      border-radius: var(--radius);
-      padding: 12px 24px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s ease, opacity 0.15s ease;
-      letter-spacing: 0.2px;
-    }
+    .btn-primary { background: var(--amber); color: #fff; border: none; border-radius: var(--radius); padding: 12px 24px; font-weight: 600; cursor: pointer; }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-secondary { background: none; color: var(--amber); border: 1.5px solid var(--amber); border-radius: var(--radius); padding: 11px 20px; cursor: pointer; }
 
-    .btn-primary:hover:not(:disabled) { background: #b8832f; }
-
-    .btn-primary:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .btn-secondary {
-      background: none;
-      color: var(--amber);
-      border: 1.5px solid var(--amber);
-      border-radius: var(--radius);
-      padding: 11px 20px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .btn-secondary:hover { background: var(--amber-pale); }
-
-    .btn-tertiary {
-      background: none;
-      color: var(--text-sec);
-      border: none;
-      padding: 11px 16px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: color 0.15s ease;
-    }
-
-    .btn-tertiary:hover { color: var(--text); }
-
-    /* ─── TELA 2: LOADING ──────────────────────────────────────── */
-    #screen-loading {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      min-height: 60vh;
-      text-align: center;
-    }
-
-    .loading-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 26px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-
-    .loading-sub {
-      font-size: 14px;
-      color: var(--text-sec);
-      margin-bottom: 32px;
-    }
-
-    .dots {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--amber);
-      opacity: 0;
-      animation: blink 1.2s infinite ease-in-out;
-    }
-
-    .dot:nth-child(1) { animation-delay: 0s; }
-    .dot:nth-child(2) { animation-delay: 0.3s; }
-    .dot:nth-child(3) { animation-delay: 0.6s; }
-
-    @keyframes blink {
-      0%, 80%, 100% { opacity: 0.15; transform: scale(0.9); }
-      40%           { opacity: 1;    transform: scale(1.1); }
-    }
-
-    /* ─── TELA 3: RESULTADO ────────────────────────────────────── */
-    #screen-result {
-      display: none;
-      max-width: 760px;
-    }
-
-    .result-header {
-      margin-bottom: 24px;
-    }
-
-    .result-tipo {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .result-meta {
-      font-size: 13px;
-      color: var(--text-sec);
-      margin-top: 4px;
-    }
-
-    .result-divider {
-      height: 2px;
-      background: var(--amber);
-      margin-top: 12px;
-      border: none;
-    }
-
+    /* ─── RESULTADO & CHAT ─────────────────────────────────────── */
+    #screen-result { display: none; max-width: 760px; }
     .result-body {
-      background: var(--white);
-      border-left: 3px solid var(--amber);
-      border-radius: 0 var(--radius) var(--radius) 0;
-      padding: 32px 36px;
-      font-size: 14px;
-      line-height: 1.8;
-      color: var(--text);
-      white-space: pre-wrap;
-      max-height: 520px;
-      overflow-y: auto;
-      user-select: text;
-      -webkit-user-select: text;
+      background: #fff; border-left: 3px solid var(--amber); padding: 32px;
+      font-size: 14px; line-height: 1.8; white-space: pre-wrap; margin: 20px 0;
     }
+    .chat-section { margin-top: 40px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; }
+    .chat-tabs { display: flex; gap: 15px; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+    .chat-tab { padding: 10px; cursor: pointer; background: none; border: none; border-bottom: 2px solid transparent; }
+    .chat-tab.active { border-bottom-color: var(--amber); color: var(--amber); font-weight: bold; }
+    .chat-history { max-height: 300px; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+    .chat-msg { padding: 10px 15px; border-radius: 8px; font-size: 13px; max-width: 85%; }
+    .chat-msg-user { align-self: flex-end; background: var(--amber-pale); border: 1px solid var(--amber); }
+    .chat-msg-ai { align-self: flex-start; background: #fff; border: 1px solid #ddd; }
+    .chat-input-row { display: flex; gap: 10px; }
+    .chat-input { flex: 1; padding: 10px; border-radius: var(--radius); border: 1px solid #ddd; resize: none; }
 
-    .result-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
+    /* ─── TRABALHISTA ESPECÍFICO ────────────────────────────── */
+    .pedido-item { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
+    .btn-pedido-action { background: var(--amber-pale); border: 1px solid var(--amber); color: var(--amber); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; }
+    
+    /* ─── LOADING ─────────────────────────────────────────── */
+    #screen-loading { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; }
+    .dot { width: 10px; height: 10px; background: var(--amber); border-radius: 50%; display: inline-block; animation: blink 1.4s infinite; margin: 0 4px; }
+    @keyframes blink { 0%, 80%, 100% { opacity: 0.2; } 40% { opacity: 1; } }
 
-    /* BLOCO 3: AVISO DE REVISAO */
-    .result-warning {
-      margin-top: 20px;
-      padding: 14px 18px;
-      background: #fdf3e3;
-      border-left: 3px solid var(--amber);
-      border-radius: 0 var(--radius) var(--radius) 0;
-      font-size: 13px;
-      color: #4a3a2a;
-      line-height: 1.6;
-    }
-
-    /* BLOCO 4: CHAT DE REFINAMENTO */
-    .chat-section {
-      margin-top: 28px;
-      border-top: 1px solid rgba(201,148,58,0.2);
-      padding-top: 20px;
-    }
-    .chat-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-sec);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-    .chat-history {
-      max-height: 360px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 14px;
-      scroll-behavior: smooth;
-    }
-    .chat-msg {
-      max-width: 88%;
-      font-size: 13px;
-      line-height: 1.6;
-      border-radius: var(--radius);
-      padding: 10px 14px;
-    }
-    .chat-msg-user {
-      align-self: flex-end;
-      background: var(--amber-pale);
-      color: var(--text);
-      border: 1px solid rgba(201,148,58,0.3);
-    }
-    .chat-msg-ai {
-      align-self: flex-start;
-      background: var(--white);
-      color: var(--text);
-      border: 1px solid rgba(0,0,0,0.07);
-      border-left: 3px solid var(--amber);
-    }
-    .chat-msg-status {
-      align-self: center;
-      background: none;
-      color: var(--text-sec);
-      font-size: 12px;
-      font-style: italic;
-      padding: 4px 0;
-    }
-    .chat-tag {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 7px;
-      border-radius: 10px;
-      margin-top: 8px;
-    }
-    .chat-tag-accepted { background: #d4edda; color: var(--green); }
-    .chat-tag-rejected  { background: #e9e9e9; color: var(--text-sec); }
-    .chat-diff { margin-top: 10px; font-size: 12px; }
-    .chat-diff-label {
-      font-weight: 600;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-sec);
-      margin-bottom: 3px;
-    }
-    .chat-diff-block {
-      background: var(--linen);
-      border-radius: 4px;
-      padding: 8px 12px;
-      font-size: 12px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      margin-bottom: 8px;
-      border-left: 2px solid rgba(201,148,58,0.4);
-    }
-    .chat-diff-block.before { border-left-color: rgba(231,76,60,0.4); }
-    .chat-diff-block.after  { border-left-color: var(--green); }
-    .chat-accept-reject { display: flex; gap: 8px; margin-top: 10px; }
-    .btn-accept {
-      background: var(--green); color: white; border: none;
-      border-radius: var(--radius); padding: 6px 14px;
-      font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
-      cursor: pointer; transition: opacity 0.15s ease;
-    }
-    .btn-accept:hover { opacity: 0.85; }
-    .btn-reject {
-      background: none; color: var(--text-sec);
-      border: 1px solid rgba(0,0,0,0.15); border-radius: var(--radius);
-      padding: 6px 14px; font-family: 'DM Sans', sans-serif;
-      font-size: 12px; cursor: pointer; transition: all 0.15s ease;
-    }
-    .btn-reject:hover { border-color: var(--red-soft); color: var(--red-soft); }
-    .chat-input-row { display: flex; gap: 8px; align-items: flex-end; }
-    .chat-input {
-      flex: 1;
-      font-family: 'DM Sans', sans-serif; font-size: 13px;
-      padding: 10px 14px;
-      border: 1.5px solid rgba(0,0,0,0.12);
-      border-radius: var(--radius);
-      background: var(--white); color: var(--text);
-      outline: none; resize: none;
-      min-height: 42px; max-height: 120px; line-height: 1.5;
-      transition: border-color 0.15s ease;
-    }
-    .chat-input:focus { border-color: var(--amber); }
-    .chat-input::placeholder { color: var(--text-sec); }
-    .btn-chat-send {
-      background: var(--amber); color: white; border: none;
-      border-radius: var(--radius); padding: 10px 16px;
-      font-size: 16px; cursor: pointer;
-      transition: background 0.15s ease;
-      flex-shrink: 0; height: 42px;
-      display: flex; align-items: center;
-    }
-    .btn-chat-send:hover:not(:disabled) { background: #b8832f; }
-    .btn-chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
-    .chat-analyzing {
-      font-size: 12px; color: var(--text-sec);
-      font-style: italic; padding: 4px 0; display: none;
-    }
-    .chat-analyzing.visible { display: block; }
-
-    .chat-tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid rgba(201,148,58,0.2);
-      padding-bottom: 0;
-    }
-    .chat-tab {
-      background: none;
-      border: none;
-      padding: 8px 16px 10px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-sec);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      transition: all 0.15s ease;
-    }
-    .chat-tab:hover { color: var(--amber); }
-    .chat-tab.active { color: var(--amber); border-bottom-color: var(--amber); font-weight: 600; }
-    .chat-panel { display: flex; flex-direction: column; }
-    .chat-corrigir { margin-top: 10px; }
-    .btn-corrigir {
-      background: none;
-      border: 1.5px solid var(--amber);
-      color: var(--amber);
-      border-radius: var(--radius);
-      padding: 9px 18px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      width: 100%;
-    }
-    .btn-corrigir:hover { background: var(--amber-pale); }
-
-    /* ─── HEADER RIGHT GROUP ────────────────────────────────── */
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .btn-trial {
-      background: var(--amber);
-      color: white;
-      border: none;
-      border-radius: var(--radius);
-      padding: 8px 16px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s ease;
-      white-space: nowrap;
-    }
-    .btn-trial:hover { background: #b8832f; }
-
-    /* ─── MODAL TRIAL ───────────────────────────────────────── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      z-index: 500;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: var(--linen);
-      border-radius: 10px;
-      padding: 36px 40px;
-      max-width: 400px;
-      width: 90%;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-      position: relative;
-    }
-    .modal-close {
-      position: absolute;
-      top: 14px; right: 16px;
-      background: none; border: none;
-      font-size: 20px; color: var(--text-sec);
-      cursor: pointer; line-height: 1;
-    }
-    .modal-close:hover { color: var(--text); }
-    .modal-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px; font-weight: 700;
-      color: var(--text); margin-bottom: 6px;
-    }
-    .modal-sub {
-      font-size: 14px; color: var(--text-sec);
-      margin-bottom: 20px;
-    }
-    .modal-input {
-      width: 100%;
-      font-family: 'DM Sans', sans-serif; font-size: 14px;
-      padding: 11px 14px;
-      border: 1.5px solid rgba(0,0,0,0.12);
-      border-radius: var(--radius);
-      background: white; color: var(--text);
-      outline: none; transition: border-color 0.15s;
-      margin-bottom: 12px;
-    }
-    .modal-input:focus { border-color: var(--amber); }
-    .modal-submit {
-      width: 100%;
-      background: var(--amber); color: white; border: none;
-      border-radius: var(--radius); padding: 12px;
-      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-      cursor: pointer; transition: background 0.15s;
-    }
-    .modal-submit:hover { background: #b8832f; }
-    .modal-fine {
-      font-size: 12px; color: var(--text-sec);
-      text-align: center; margin-top: 12px; line-height: 1.6;
-    }
-    .modal-success {
-      display: none;
-      text-align: center; padding: 16px 0;
-    }
-    .modal-success-icon { font-size: 36px; margin-bottom: 8px; }
-    .modal-success-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px; font-weight: 600; color: var(--text);
-      margin-bottom: 6px;
-    }
-    .modal-success-text { font-size: 13px; color: var(--text-sec); line-height: 1.6; }
-
-    /* ─── 3ª ABA: REVISAR ───────────────────────────────────── */
-    .chat-input:disabled {
-      background: var(--linen-dark);
-      color: var(--text-sec);
-      cursor: not-allowed;
-      border-color: rgba(0,0,0,0.07);
-    }
-    .btn-chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* ─── FOOTER ───────────────────────────────────────────────── */
-    .footer {
-      text-align: center;
-      padding: 16px 32px;
-      font-size: 12px;
-      color: var(--text-sec);
-      border-top: 1px solid rgba(201,148,58,0.15);
-      flex-shrink: 0;
-    }
-
-    /* ─── OVERLAY SIDEBAR (mobile) ─────────────────────────────── */
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.35);
-      z-index: 50;
-    }
-
-    /* ─── RESPONSIVE ───────────────────────────────────────────── */
+    /* ─── MOBILE ───────────────────────────────────────────── */
     @media (max-width: 768px) {
       .hamburger { display: flex; }
-      .tagline   { display: none; }
-
-      .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100%;
-        z-index: 200;
-        transform: translateX(-100%);
-      }
-
-      .sidebar.open {
-        transform: translateX(0);
-      }
-
+      .sidebar { position: fixed; left: 0; top: 0; height: 100%; z-index: 200; transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 150; }
       .sidebar-overlay.open { display: block; }
-
-      .body-row { overflow: visible; }
-
-      .main {
-        padding: 28px 20px;
-      }
-
-      .tipos-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
-      .result-actions {
-        justify-content: stretch;
-      }
-
-      .result-actions button {
-        flex: 1;
-      }
+      .main { padding: 20px; }
+      .tipos-grid { grid-template-columns: repeat(2, 1fr); }
+      .form-row { grid-template-columns: 1fr; }
     }
-
-
-    /* --- TRABALHISTA CSS --- */
-    details.form-section-details { background:var(--white); border:1.5px solid rgba(201,148,58,.25); border-radius:var(--radius); margin-bottom:14px; overflow:hidden; }
-    details.form-section-details[open] summary::after { transform:rotate(180deg); }
-    details.form-section-details summary { display:flex; align-items:center; justify-content:space-between; padding:13px 16px; cursor:pointer; list-style:none; font-size:12px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--amber); background:var(--amber-pale); user-select:none; }
-    details.form-section-details summary::-webkit-details-marker { display:none; }
-    details.form-section-details summary::after { content:"\25be"; font-size:16px; color:var(--amber); transition:transform .2s; }
-    .details-body { padding:16px 16px 18px; display:flex; flex-direction:column; gap:14px; }
-    .form-section-plain { margin-bottom:14px; }
-    .form-section-title { font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--text-sec); margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid rgba(201,148,58,.2); }
-    .tipo-parte-toggle { display:flex; gap:8px; margin-bottom:12px; }
-    .tipo-parte-btn { flex:1; padding:7px 10px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; border:1.5px solid rgba(201,148,58,.3); border-radius:var(--radius); background:var(--linen); color:var(--text-sec); cursor:pointer; transition:all .15s; text-align:center; }
-    .tipo-parte-btn.active { background:var(--amber); border-color:var(--amber); color:#fff; font-weight:600; }
-    .valor-input-wrap { position:relative; }
-    .valor-input-wrap .valor-prefix { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:14px; font-weight:500; color:var(--text-sec); pointer-events:none; }
-    .valor-input-wrap input { padding-left:32px; }
-    .pedidos-list { display:flex; flex-direction:column; gap:8px; }
-    .pedido-item { display:flex; gap:8px; align-items:center; }
-    .pedido-item input { flex:1; }
-    .pedido-num { font-size:12px; font-weight:600; color:var(--amber); min-width:18px; text-align:right; flex-shrink:0; }
-    .btn-pedido-action { width:30px; height:38px; border:1.5px solid rgba(201,148,58,.35); border-radius:var(--radius); background:var(--linen); color:var(--amber); font-size:18px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
-    .btn-pedido-action:hover { background:var(--amber); color:#fff; border-color:var(--amber); }
-    .upload-zone-trab { border:2px dashed rgba(201,148,58,.35); border-radius:var(--radius); padding:18px; text-align:center; background:var(--linen); cursor:pointer; transition:border-color .2s; }
-    .upload-zone-trab:hover { border-color:var(--amber); }
-    .upload-zone-trab .upload-icon { font-size:24px; margin-bottom:4px; }
-    .upload-zone-trab .upload-text { font-size:13px; color:var(--text-sec); }
-    .upload-zone-trab .upload-text strong { color:var(--amber); }
-    .upload-zone-trab .upload-hint { font-size:11px; color:var(--text-sec); margin-top:3px; }
-    .field-wrap select { font-family:'DM Sans',sans-serif; font-size:14px; padding:10px 32px 10px 12px; border:1.5px solid rgba(0,0,0,.12); border-radius:var(--radius); background:var(--white); color:var(--text); outline:none; transition:border-color .15s; appearance:none; cursor:pointer; width:100%; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23C9943A' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
-    .field-wrap select:focus { border-color:var(--amber); }
-    .radio-group-inline { display:flex; gap:20px; padding:10px 0 2px; align-items:center; }
-    .radio-group-inline label { display:flex; align-items:center; gap:6px; font-size:14px; color:var(--text); cursor:pointer; font-weight:400; }
-    .radio-group-inline input[type="radio"] { accent-color:var(--amber); width:15px; height:15px; }
-    #form-trabalhista { opacity:0; pointer-events:none; transform:translateY(8px); transition:opacity .25s,transform .25s; }
-    #form-trabalhista.visible { opacity:1; pointer-events:all; transform:translateY(0); }
-    /* ─── UTILIDADES ───────────────────────────────────────────── */
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
 <div class="app">
-
-  <!-- HEADER -->
   <header class="header">
-    <button class="hamburger" id="btn-hamburger" aria-label="Abrir histórico">
-      <span></span><span></span><span></span>
-    </button>
+    <button class="hamburger" id="btn-hamburger"><span></span><span></span><span></span></button>
     <div class="logo">Peti.PRO</div>
-    <div class="header-right">
-      <div class="tagline">Petições em segundos.</div>
-      <button class="btn-trial" id="btn-trial">Testar 7 dias grátis →</button>
-    </div>
+    <button class="btn-primary" style="padding: 8px 16px; font-size: 13px;">7 dias grátis</button>
   </header>
 
-  <!-- BODY ROW -->
   <div class="body-row">
-
-    <!-- SIDEBAR OVERLAY (mobile) -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-top">
         <div class="sidebar-title-row">
           <span class="sidebar-title">Biblioteca</span>
-          <span class="sidebar-counter" id="sidebar-counter"></span>
+          <span class="sidebar-counter" id="sidebar-counter">0</span>
         </div>
-        <input
-          class="sidebar-search"
-          id="sidebar-search"
-          type="text"
-          placeholder="Buscar por nome ou tipo…"
-          autocomplete="off"
-        />
+        <input class="sidebar-search" id="sidebar-search" type="text" placeholder="Buscar..." />
       </div>
       <div class="sidebar-list" id="sidebar-list"></div>
       <div class="sidebar-footer">
-        <div class="sidebar-export-row">
-          <button class="btn-sidebar" id="btn-export-pdf">↓ PDF geral</button>
-          <button class="btn-sidebar" id="btn-export-excel">↓ Excel</button>
-        </div>
-        <button class="btn-clear" id="btn-clear-hist">Limpar biblioteca</button>
-        <div class="clear-confirm" id="clear-confirm">
-          Tem certeza?
-          <div class="clear-confirm-btns">
-            <button class="btn-confirm-yes" id="btn-confirm-yes">Sim, limpar</button>
-            <button class="btn-confirm-no"  id="btn-confirm-no">Cancelar</button>
-          </div>
-        </div>
+        <button class="btn-sidebar" id="btn-export-pdf">PDF Geral</button>
+        <button class="btn-sidebar" style="color: var(--red-soft);" id="btn-clear-hist">Limpar Tudo</button>
       </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="main" id="main-content">
-
-      <!-- TELA 1: FORMULÁRIO -->
+    <main class="main">
+      <!-- TELA 1: FORM -->
       <section id="screen-form">
         <h1 class="screen-title">Nova petição</h1>
-
-        <!-- Grid de tipos -->
         <div class="tipos-grid" id="tipos-grid">
-          <div class="tipo-card" data-tipo="Inicial Trabalhista" tabindex="0">
-            <span class="tipo-card-icon">⚖️</span>
-            <div class="tipo-card-nome">Inicial Trabalhista</div>
-            <div class="tipo-card-desc">Reclamação na Justiça do Trabalho</div>
-          </div>
-          <div class="tipo-card" data-tipo="Recurso Ordinário" tabindex="0">
-            <span class="tipo-card-icon">📋</span>
-            <div class="tipo-card-nome">Recurso Ordinário</div>
-            <div class="tipo-card-desc">Recurso contra sentença de 1ª instância</div>
-          </div>
-          <div class="tipo-card" data-tipo="Habeas Corpus" tabindex="0">
-            <span class="tipo-card-icon">🔓</span>
-            <div class="tipo-card-nome">Habeas Corpus</div>
-            <div class="tipo-card-desc">Liberdade de locomoção</div>
-          </div>
-          <div class="tipo-card" data-tipo="Contestação Cível" tabindex="0">
-            <span class="tipo-card-icon">🛡️</span>
-            <div class="tipo-card-nome">Contestação Cível</div>
-            <div class="tipo-card-desc">Defesa em ação cível</div>
-          </div>
-          <div class="tipo-card" data-tipo="Petição Inicial Previdenciária" tabindex="0">
-            <span class="tipo-card-icon">📄</span>
-            <div class="tipo-card-nome">Petição Inicial Previdenciária</div>
-            <div class="tipo-card-desc">Direitos junto ao INSS</div>
-          </div>
-          <div class="tipo-card" data-tipo="Mandado de Segurança" tabindex="0">
-            <span class="tipo-card-icon">🏛️</span>
-            <div class="tipo-card-nome">Mandado de Segurança</div>
-            <div class="tipo-card-desc">Direito líquido e certo violado</div>
-          </div>
-          <div class="tipo-card" data-tipo="Ação de Indenização" tabindex="0">
-            <span class="tipo-card-icon">💼</span>
-            <div class="tipo-card-nome">Ação de Indenização</div>
-            <div class="tipo-card-desc">Danos materiais ou morais</div>
-          </div>
-          <div class="tipo-card" data-tipo="Embargos de Declaração" tabindex="0">
-            <span class="tipo-card-icon">📝</span>
-            <div class="tipo-card-nome">Embargos de Declaração</div>
-            <div class="tipo-card-desc">Esclarecimento de decisão judicial</div>
-          </div>
+          <div class="tipo-card" data-tipo="Inicial Trabalhista">⚖️ <b>Trabalhista</b></div>
+          <div class="tipo-card" data-tipo="Habeas Corpus">🔓 <b>Habeas Corpus</b></div>
+          <div class="tipo-card" data-tipo="Contestação Cível">🛡️ <b>Contestação</b></div>
+          <div class="tipo-card" data-tipo="Indenização">💼 <b>Indenização</b></div>
         </div>
 
-        <!-- Campos (aparecem após selecionar tipo) -->
+        <!-- FORM PADRÃO -->
         <div class="form-fields" id="form-fields">
           <div class="form-row">
             <div class="field-wrap">
-              <label for="campo-nome">Nome do cliente *</label>
-              <input type="text" id="campo-nome" placeholder="Ex.: João da Silva" />
-              <span class="field-error" id="erro-nome">Informe o nome do cliente.</span>
+              <label>Nome do Cliente *</label>
+              <input type="text" id="campo-nome" />
+              <span class="field-error" id="erro-nome">Obrigatório</span>
             </div>
             <div class="field-wrap">
-              <label for="campo-cpf">CPF do cliente</label>
+              <label>CPF</label>
               <input type="text" id="campo-cpf" placeholder="000.000.000-00" />
             </div>
           </div>
-
-          <div class="form-row">
-            <div class="field-wrap">
-              <label for="campo-contra">Parte contrária</label>
-              <input type="text" id="campo-contra" placeholder="Nome da empresa ou pessoa" />
-            </div>
-            <div class="field-wrap">
-              <label for="campo-vara">Vara / Foro</label>
-              <input type="text" id="campo-vara" placeholder="Ex.: 3ª Vara do Trabalho de SP" />
-            </div>
-          </div>
-
           <div class="form-row single">
             <div class="field-wrap">
-              <label for="campo-fatos">Fatos do caso *</label>
-              <textarea id="campo-fatos" rows="5" placeholder="Descreva os fatos relevantes do caso…"></textarea>
-              <span class="field-error" id="erro-fatos">Descreva os fatos do caso.</span>
+              <label>Fatos *</label>
+              <textarea id="campo-fatos" rows="5"></textarea>
             </div>
           </div>
-
           <div class="form-row">
             <div class="field-wrap">
-              <label for="campo-pedido">Pedido principal *</label>
-              <input type="text" id="campo-pedido" placeholder="O que o cliente quer obter" />
-              <span class="field-error" id="erro-pedido">Informe o pedido principal.</span>
+              <label>Pedido Principal *</label>
+              <input type="text" id="campo-pedido" />
             </div>
             <div class="field-wrap">
-              <label for="campo-valor">Valor da causa R$</label>
-              <input type="text" id="campo-valor" placeholder="Ex.: 15.000,00" />
+              <label>Valor da Causa</label>
+              <input type="text" id="campo-valor" placeholder="R$ 0,00" />
             </div>
           </div>
-
-          <div class="form-actions">
-            <button class="btn-primary" id="btn-gerar">Gerar petição →</button>
-          </div>
+          <button class="btn-primary" id="btn-gerar">Gerar Petição →</button>
         </div>
 
+        <!-- FORM TRABALHISTA -->
         <div id="form-trabalhista">
-          <details class="form-section-details" open>
-            <summary>Qualificação do Cliente</summary>
-            <div class="details-body">
-              <div class="form-row">
-                <div class="field-wrap">
-                  <label for="t-nome">Nome completo *</label>
-                  <input type="text" id="t-nome" placeholder="Ex.: Maria Santos da Silva" />
-                  <span class="field-error" id="t-erro-nome">Informe o nome do cliente.</span>
-                </div>
-                <div class="field-wrap">
-                  <label for="t-estado-civil">Estado Civil</label>
-                  <select id="t-estado-civil"><option value="" disabled selected>Selecione…</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option></select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="field-wrap">
-                  <label for="t-profissao">Profissão</label>
-                  <input type="text" id="t-profissao" placeholder="Ex.: Auxiliar Administrativo" />
-                </div>
-                <div class="field-wrap">
-                  <label for="t-cpf">CPF *</label>
-                  <input type="text" id="t-cpf" placeholder="000.000.000-00" maxlength="14" />
-                  <span class="field-error" id="t-erro-cpf">Informe o CPF.</span>
-                </div>
-              </div>
-              <div class="form-row single">
-                <div class="field-wrap">
-                  <label for="t-endereco">Endereço</label>
-                  <input type="text" id="t-endereco" placeholder="Rua, nº, complemento, cidade — UF" />
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <details class="form-section-details" open>
-            <summary>Qualificação da Parte Contrária</summary>
-            <div class="details-body">
-              <div class="tipo-parte-toggle">
-                <button class="tipo-parte-btn active" id="t-btn-pf" type="button">Pessoa Física</button>
-                <button class="tipo-parte-btn" id="t-btn-pj" type="button">Pessoa Jurídica</button>
-              </div>
-              <div class="form-row">
-                <div class="field-wrap">
-                  <label id="t-label-contra-nome">Nome completo</label>
-                  <input type="text" id="t-contra-nome" placeholder="Nome da pessoa ou empresa" />
-                </div>
-                <div class="field-wrap" id="t-wrap-contra-ec">
-                  <label>Estado Civil</label>
-                  <select id="t-contra-estado-civil"><option value="" disabled selected>Selecione…</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option></select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="field-wrap">
-                  <label id="t-label-contra-doc">CPF</label>
-                  <input type="text" id="t-contra-doc" placeholder="000.000.000-00" maxlength="18" />
-                </div>
-                <div class="field-wrap">
-                  <label for="t-contra-endereco">Endereço</label>
-                  <input type="text" id="t-contra-endereco" placeholder="Rua, nº, complemento, cidade — UF" />
-                </div>
-              </div>
-              <div class="form-row single">
-                <div class="field-wrap">
-                  <label for="t-vara">Vara / Foro</label>
-                  <input type="text" id="t-vara" placeholder="Ex.: 3ª Vara do Trabalho de SP" />
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <div class="form-section-plain">
-            <div class="form-section-title">Fundamentação</div>
-            <div class="form-row single" style="margin-bottom:14px">
+           <div class="form-row">
               <div class="field-wrap">
-                <label for="t-fatos">Fatos do caso *</label>
-                <textarea id="t-fatos" rows="5" placeholder="Descreva os fatos relevantes…"></textarea>
-                <span class="field-error" id="t-erro-fatos">Descreva os fatos do caso.</span>
-              </div>
-            </div>
-            <div class="form-row single">
-              <div class="field-wrap">
-                <label for="t-fundamentos">Fundamentos Jurídicos</label>
-                <textarea id="t-fundamentos" rows="3" placeholder="Ex.: Art. 7º CF, CLT art. 483…"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-section-plain">
-            <div class="form-section-title">Pedido</div>
-            <div class="field-wrap" style="margin-bottom:14px">
-              <label>Pedido(s) principal(is) *</label>
-              <div class="pedidos-list" id="t-pedidos-list">
-                <div class="pedido-item">
-                  <span class="pedido-num">1.</span>
-                  <input type="text" placeholder="Ex.: Pagamento de horas extras" />
-                  <button class="btn-pedido-action" type="button" id="btn-add-pedido" title="Adicionar">+</button>
-                </div>
-              </div>
-              <span class="field-error" id="t-erro-pedido">Informe ao menos um pedido.</span>
-            </div>
-            <div class="form-row">
-              <div class="field-wrap">
-                <label>Requer Audiência de Conciliação?</label>
-                <div class="radio-group-inline">
-                  <label><input type="radio" name="t-audiencia" value="sim" checked /> Sim</label>
-                  <label><input type="radio" name="t-audiencia" value="nao" /> Não</label>
-                </div>
+                <label>Nome do Reclamante *</label>
+                <input type="text" id="t-nome" />
               </div>
               <div class="field-wrap">
-                <label for="t-valor">Valor da causa</label>
-                <div class="valor-input-wrap">
-                  <span class="valor-prefix">R$</span>
-                  <input type="text" id="t-valor" placeholder="0,00" />
-                </div>
+                <label>CPF *</label>
+                <input type="text" id="t-cpf" maxlength="14" />
               </div>
-            </div>
-          </div>
-
-          <div class="form-section-plain">
-            <div class="form-section-title">Documentos</div>
-            <div class="upload-zone-trab" id="t-upload-zone">
-              <div class="upload-icon">&#128206;</div>
-              <div class="upload-text" id="t-upload-text"><strong>Clique para anexar</strong> ou arraste os arquivos</div>
-              <div class="upload-hint">PDF, DOCX, JPG, PNG — múltiplos arquivos permitidos</div>
-            </div>
-            <input type="file" id="t-upload" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display:none" />
-          </div>
-
-          <div class="form-actions">
-            <button class="btn-primary" id="btn-gerar-trab">Gerar petição →</button>
-          </div>
+           </div>
+           <div class="field-wrap" style="margin-bottom: 16px;">
+              <label>Fatos do Trabalho *</label>
+              <textarea id="t-fatos" rows="4"></textarea>
+           </div>
+           <div class="field-wrap">
+              <label>Pedidos (um por linha)</label>
+              <div id="t-pedidos-list">
+                <div class="pedido-item"><input type="text" placeholder="Ex: Verbas Rescisórias" /></div>
+              </div>
+              <button class="btn-pedido-action" id="btn-add-pedido" type="button">+</button>
+           </div>
+           <div class="field-wrap" style="margin-top: 16px;">
+              <label>Valor Estimado</label>
+              <input type="text" id="t-valor" placeholder="0,00" />
+           </div>
+           <button class="btn-primary" style="margin-top: 20px;" id="btn-gerar-trab">Gerar Inicial →</button>
         </div>
       </section>
 
       <!-- TELA 2: LOADING -->
       <section id="screen-loading">
-        <div class="loading-title">Gerando sua petição…</div>
-        <div class="loading-sub">Isso leva alguns segundos.</div>
-        <div class="dots">
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
+        <h3>Processando com Inteligência Jurídica...</h3>
+        <div style="margin-top: 20px;">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
       </section>
 
       <!-- TELA 3: RESULTADO -->
       <section id="screen-result">
-        <div class="result-header">
-          <div class="result-tipo" id="result-tipo"></div>
-          <div class="result-meta" id="result-meta"></div>
-          <hr class="result-divider" />
-        </div>
+        <h2 id="result-tipo">Petição</h2>
         <div class="result-body" id="result-body"></div>
-
-        <!-- BLOCO 3: AVISO DE REVISÃO -->
-        <div class="result-warning">
-          ⚠ Documento gerado por IA. Revise antes de protocolar. A responsabilidade técnica e jurídica é sempre do advogado signatário.
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-secondary" id="btn-copiar">Copiar Texto</button>
+          <button class="btn-primary" id="btn-pdf">Baixar PDF</button>
+          <button class="btn-secondary" id="btn-nova">Nova</button>
         </div>
 
-        <div class="result-actions">
-          <button class="btn-tertiary" id="btn-nova">Nova petição</button>
-          <button class="btn-secondary" id="btn-copiar">Copiar texto</button>
-          <button class="btn-primary"   id="btn-pdf">Baixar PDF</button>
-        </div>
-
-        <!-- BLOCOS 4+5: PAINEL COM ABAS -->
-        <div class="chat-section" id="chat-section">
-          <div class="chat-tabs" id="chat-tabs">
-            <button class="chat-tab active" data-tab="refinar" id="tab-refinar">💬 Refinar com IA</button>
-            <button class="chat-tab"        data-tab="simular" id="tab-simular">⚔ Simular Defesa</button>
-            <button class="chat-tab"        data-tab="revisar" id="tab-revisar">🔍 Revisar</button>
+        <div class="chat-section">
+          <div class="chat-tabs">
+            <button class="chat-tab active" data-tab="refinar">💬 Refinar</button>
+            <button class="chat-tab" data-tab="simular">⚔️ Simular Defesa</button>
           </div>
-
-          <!-- Painel Refinar -->
-          <div class="chat-panel" id="panel-refinar">
-            <div class="chat-history" id="chat-history-refinar"></div>
-            <div class="chat-analyzing" id="chat-analyzing-refinar">Analisando…</div>
-          </div>
-
-          <!-- Painel Simular -->
-          <div class="chat-panel hidden" id="panel-simular">
-            <div class="chat-history" id="chat-history-simular"></div>
-            <div class="chat-analyzing" id="chat-analyzing-simular">Analisando pontos vulneráveis…</div>
-            <div class="chat-corrigir hidden" id="chat-corrigir">
-              <button class="btn-corrigir" id="btn-corrigir">Corrigir pontos fracos na petição →</button>
-            </div>
-          </div>
-
-          <!-- Painel Revisar -->
-          <div class="chat-panel hidden" id="panel-revisar">
-            <div class="chat-history" id="chat-history-revisar"></div>
-            <div class="chat-analyzing" id="chat-analyzing-revisar">Revisando a petição como revisor independente…</div>
-            <div class="chat-corrigir hidden" id="chat-corrigir-revisar">
-              <button class="btn-corrigir" id="btn-corrigir-revisar">Corrigir tudo automaticamente →</button>
-            </div>
-          </div>
-
-          <!-- Input compartilhado -->
+          <div class="chat-history" id="chat-history"></div>
           <div class="chat-input-row">
-            <textarea
-              class="chat-input"
-              id="chat-input"
-              placeholder="Digite uma instrução ex: adiciona pedido de danos morais"
-              rows="1"
-            ></textarea>
-            <button class="btn-chat-send" id="btn-chat-send" title="Enviar">→</button>
+            <textarea class="chat-input" id="chat-input" placeholder="Peça uma alteração..." rows="1"></textarea>
+            <button class="btn-primary" id="btn-chat-send">Enviar</button>
           </div>
         </div>
       </section>
-
     </main>
-  </div>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    Conecte.se — A chateação fica com a gente.
-  </footer>
-
-</div>
-
-<!-- MODAL TRIAL -->
-<div class="modal-overlay" id="modal-trial">
-  <div class="modal-box">
-    <button class="modal-close" id="modal-close" aria-label="Fechar">&times;</button>
-    <div id="modal-form-content">
-      <div class="modal-title">Começar seu trial gratuito</div>
-      <div class="modal-sub">Qual seu WhatsApp ou email?</div>
-      <input
-        class="modal-input"
-        id="modal-contact"
-        type="text"
-        placeholder="ex: 11 99999-9999 ou nome@email.com"
-        autocomplete="off"
-      />
-      <button class="modal-submit" id="modal-submit">Receber meu link →</button>
-      <div class="modal-fine">Sem cartão. Sem compromisso.<br>7 dias completos, tudo incluído.</div>
-    </div>
-    <div class="modal-success" id="modal-success">
-      <div class="modal-success-icon">✓</div>
-      <div class="modal-success-title">Recebemos seu contato!</div>
-      <div class="modal-success-text">Em instantes você recebe o link<br>no seu WhatsApp ou email.</div>
-    </div>
   </div>
 </div>
 
 <script>
-  /* ─────────────────────────────────────────────────────────────
-     ESTADO GLOBAL
-  ───────────────────────────────────────────────────────────── */
+  /* ─── ESTADO & UTILS ─────────────────────────────────────── */
   let tipoSelecionado = '';
-  let dadosAtivos    = {};
-  let textoAtivo     = '';
-
-  /* ─────────────────────────────────────────────────────────────
-     ELEMENTOS
-  ───────────────────────────────────────────────────────────── */
+  let textoAtivo = '';
+  let dadosAtivos = {};
   const $ = id => document.getElementById(id);
 
-  const screenForm    = $('screen-form');
-  const screenLoading = $('screen-loading');
-  const screenResult  = $('screen-result');
-  const formFields    = $('form-fields');
-  const tiposGrid     = $('tipos-grid');
-  const sidebarEl     = $('sidebar');
-  const overlayEl     = $('sidebar-overlay');
+  /* ─── MÁSCARAS (CORRIGIDAS) ───────────────────────────────── */
+  const aplicarMascaras = () => {
+    const maskCPF = v => v.replace(/\D/g, '').slice(0, 11).replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    const maskValor = v => {
+      let val = v.replace(/\D/g, '');
+      if (!val) return '';
+      val = (parseInt(val) / 100).toFixed(2);
+      return val.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    };
 
-  /* ─────────────────────────────────────────────────────────────
-     HAMBÚRGUER (MOBILE)
-  ───────────────────────────────────────────────────────────── */
-  $('btn-hamburger').addEventListener('click', () => {
-    sidebarEl.classList.toggle('open');
-    overlayEl.classList.toggle('open');
-  });
-  overlayEl.addEventListener('click', () => {
-    sidebarEl.classList.remove('open');
-    overlayEl.classList.remove('open');
-  });
+    $('campo-cpf').oninput = e => e.target.value = maskCPF(e.target.value);
+    $('t-cpf').oninput = e => e.target.value = maskCPF(e.target.value);
+    $('campo-valor').oninput = e => e.target.value = 'R$ ' + maskValor(e.target.value);
+    $('t-valor').oninput = e => e.target.value = maskValor(e.target.value);
+  };
 
-  /* ─────────────────────────────────────────────────────────────
-     SELEÇÃO DE TIPO
-  ───────────────────────────────────────────────────────────── */
-  tiposGrid.addEventListener('click', e => {
+  /* ─── NAVEGAÇÃO ──────────────────────────────────────────── */
+  const showScreen = name => {
+    $('screen-form').style.display = name === 'form' ? 'block' : 'none';
+    $('screen-loading').style.display = name === 'loading' ? 'flex' : 'none';
+    $('screen-result').style.display = name === 'result' ? 'block' : 'none';
+  };
+
+  /* ─── SELEÇÃO DE TIPO ────────────────────────────────────── */
+  $('tipos-grid').onclick = e => {
     const card = e.target.closest('.tipo-card');
     if (!card) return;
     document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
     card.classList.add('selected');
     tipoSelecionado = card.dataset.tipo;
-    var isTrab = tipoSelecionado === 'Inicial Trabalhista';
-    formFields.classList.toggle('visible', !isTrab);
-    document.getElementById('form-trabalhista').classList.toggle('visible', isTrab);
-    (isTrab ? document.getElementById('form-trabalhista') : formFields).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  });
+    
+    const isTrab = tipoSelecionado === 'Inicial Trabalhista';
+    $('form-fields').classList.toggle('visible', !isTrab);
+    $('form-trabalhista').classList.toggle('visible', isTrab);
+  };
 
-  // Suporte a teclado
-  tiposGrid.addEventListener('keydown', e => {
-    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('tipo-card')) {
-      e.preventDefault();
-      e.target.click();
-    }
-  });
-
-  /* ─────────────────────────────────────────────────────────────
-     MOSTRAR / ESCONDER TELAS
-  ───────────────────────────────────────────────────────────── */
-  function showScreen(name) {
-    screenForm.style.display    = name === 'form'    ? 'block'  : 'none';
-    screenLoading.style.display = name === 'loading' ? 'flex'   : 'none';
-    screenResult.style.display  = name === 'result'  ? 'block'  : 'none';
-  }
-
-  /* ─────────────────────────────────────────────────────────────
-     VALIDAÇÃO INLINE
-  ───────────────────────────────────────────────────────────── */
-  function validar() {
-    let ok = true;
-    const campos = [
-      { id: 'campo-nome',   erro: 'erro-nome'   },
-      { id: 'campo-fatos',  erro: 'erro-fatos'  },
-      { id: 'campo-pedido', erro: 'erro-pedido' },
-    ];
-    campos.forEach(({ id, erro }) => {
-      const el = $(id);
-      const er = $(erro);
-      if (!el.value.trim()) {
-        el.classList.add('error');
-        er.classList.add('visible');
-        ok = false;
-      } else {
-        el.classList.remove('error');
-        er.classList.remove('visible');
-      }
-    });
-    return ok;
-  }
-
-  // Limpar erro ao digitar
-  ['campo-nome', 'campo-fatos', 'campo-pedido'].forEach(id => {
-    $(id).addEventListener('input', () => {
-      $(id).classList.remove('error');
-    });
-  });
-
-  /* ─────────────────────────────────────────────────────────────
-     GERAR PETIÇÃO
-  ───────────────────────────────────────────────────────────── */
-  $('btn-gerar').addEventListener('click', async () => {
-    if (!tipoSelecionado) {
-      tiposGrid.scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-    if (!validar()) return;
-
-    dadosAtivos = {
-      tipo:   tipoSelecionado,
-      nome:   $('campo-nome').value.trim(),
-      cpf:    $('campo-cpf').value.trim(),
-      contra: $('campo-contra').value.trim(),
-      vara:   $('campo-vara').value.trim(),
-      fatos:  $('campo-fatos').value.trim(),
-      pedido: $('campo-pedido').value.trim(),
-      valor:  $('campo-valor').value.trim(),
-    };
-
-    const btn = $('btn-gerar');
-    btn.disabled  = true;
-    btn.textContent = 'Gerando…';
-
+  /* ─── GERAR PETIÇÃO ──────────────────────────────────────── */
+  const dispararGeracao = async (dados) => {
     showScreen('loading');
-
     try {
       const resp = await fetch('/api/gerar', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dadosAtivos),
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(dados)
       });
-
       const data = await resp.json();
-
-      if (data.erro === 'API_NAO_CONFIGURADA') {
-        textoAtivo = 'A geração de petições ainda não está ativa nesta instalação. Para ativar, configure sua chave de API nas variáveis de ambiente da Vercel. Dúvidas? Fale com a Conecte.se.';
-      } else if (data.peticao) {
-        textoAtivo = data.peticao;
-        salvarHistorico(dadosAtivos, textoAtivo);
-      } else {
-        textoAtivo = data.erro || 'Erro ao gerar petição. Tente novamente.';
-      }
-    } catch (err) {
-      // Sem API configurada (localhost sem backend): mensagem amigável
-      textoAtivo = 'A geração de petições ainda não está ativa nesta instalação. Para ativar, configure sua chave de API nas variáveis de ambiente da Vercel. Dúvidas? Fale com a Conecte.se.';
+      textoAtivo = data.peticao || "Erro: API não conectada ou sem saldo.";
+      dadosAtivos = { ...dados, id: Date.now() };
+      
+      $('result-tipo').textContent = dados.tipo;
+      $('result-body').textContent = textoAtivo;
+      salvarNoHistorico(dadosAtivos, textoAtivo);
+      showScreen('result');
+    } catch (e) {
+      alert("Falha técnica. Verifique sua conexão.");
+      showScreen('form');
     }
+  };
 
-    exibirResultado(dadosAtivos, textoAtivo);
-
-    btn.disabled    = false;
-    btn.textContent = 'Gerar petição →';
-  });
-
-  /* ─────────────────────────────────────────────────────────────
-     EXIBIR RESULTADO
-  ───────────────────────────────────────────────────────────── */
-  function exibirResultado(dados, texto) {
-    const agora = new Date();
-    const dataStr = agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-    $('result-tipo').textContent = dados.tipo;
-    $('result-meta').textContent = (dados.nome || 'Cliente') + ' · ' + dataStr;
-    $('result-body').textContent = texto;
-    showScreen('result');
-  }
-
-  /* ─────────────────────────────────────────────────────────────
-     NOVA PETIÇÃO
-  ───────────────────────────────────────────────────────────── */
-  $('btn-nova').addEventListener('click', () => {
-    tipoSelecionado = '';
-    document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
-    ['campo-nome','campo-cpf','campo-contra','campo-vara','campo-fatos','campo-pedido','campo-valor'].forEach(id => $(id).value = '');
-    ['campo-nome','campo-fatos','campo-pedido'].forEach(id => $(id).classList.remove('error'));
-    ['erro-nome','erro-fatos','erro-pedido'].forEach(id => $(id).classList.remove('visible'));
-    formFields.classList.remove('visible');
-    var ftEl = document.getElementById('form-trabalhista'); if(ftEl) ftEl.classList.remove('visible');
-    ['t-nome','t-cpf','t-profissao','t-endereco','t-contra-nome','t-contra-doc','t-contra-endereco','t-vara','t-fatos','t-fundamentos','t-valor'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-    ['t-estado-civil','t-contra-estado-civil'].forEach(function(id){var el=document.getElementById(id);if(el)el.selectedIndex=0;});
-    var pl=document.getElementById('t-pedidos-list');if(pl){pl.querySelectorAll('.pedido-item:not(:first-child)').forEach(function(el){el.remove();});var fi=pl.querySelector('input[type=text]');if(fi)fi.value='';}
-    resetChat();
-    showScreen('form');
-  });
-
-  /* ─────────────────────────────────────────────────────────────
-     COPIAR TEXTO
-  ───────────────────────────────────────────────────────────── */
-  $('btn-copiar').addEventListener('click', async () => {
-    const btn = $('btn-copiar');
-    try {
-      await navigator.clipboard.writeText(textoAtivo);
-      btn.textContent = 'Copiado! ✓';
-      setTimeout(() => { btn.textContent = 'Copiar texto'; }, 2000);
-    } catch {
-      btn.textContent = 'Copiar texto';
-    }
-  });
-
-  /* ─────────────────────────────────────────────────────────────
-     BAIXAR PDF (jsPDF)
-  ───────────────────────────────────────────────────────────── */
-  $('btn-pdf').addEventListener('click', () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-
-    const marLeft  = 30;   // 3cm
-    const marRight = 20;   // 2cm
-    const marTop   = 25;   // 2.5cm
-    const marBot   = 20;   // 2cm
-    const pageW    = 210;
-    const pageH    = 297;
-    const contentW = pageW - marLeft - marRight;
-
-    const agora   = new Date();
-    const dataHoje = agora.toLocaleDateString('pt-BR');
-
-    // ── Cabeçalho ───────────────────────────────
-    doc.setFont('times', 'bold');
-    doc.setFontSize(11);
-    doc.text('Peti.PRO', marLeft, marTop);
-    doc.setFont('times', 'normal');
-    doc.text(dataHoje, pageW - marRight, marTop, { align: 'right' });
-    doc.setDrawColor(201, 148, 58);
-    doc.setLineWidth(0.5);
-    doc.line(marLeft, marTop + 3, pageW - marRight, marTop + 3);
-
-    // ── Corpo ────────────────────────────────────
-    doc.setFont('times', 'normal');
-    doc.setFontSize(12);
-    doc.setTextColor(28, 28, 28);
-
-    const linhas = doc.splitTextToSize(textoAtivo, contentW);
-    const lineH  = 7.5; // ~1.5 spacing @ 12pt
-    let y = marTop + 14;
-    let pagina = 1;
-
-    const rodape = (p) => {
-      doc.setFont('times', 'normal');
-      doc.setFontSize(10);
-      doc.setTextColor(107, 107, 107);
-      doc.text(String(p), pageW / 2, pageH - 10, { align: 'center' });
-      doc.setTextColor(28, 28, 28);
-      doc.setFontSize(12);
+  $('btn-gerar').onclick = () => {
+    const dados = {
+      tipo: tipoSelecionado,
+      nome: $('campo-nome').value,
+      fatos: $('campo-fatos').value,
+      pedido: $('campo-pedido').value,
+      valor: $('campo-valor').value
     };
+    dispararGeracao(dados);
+  };
 
-    linhas.forEach(linha => {
-      if (y + lineH > pageH - marBot) {
-        rodape(pagina);
-        doc.addPage();
-        pagina++;
-        // cabeçalho nova página
-        doc.setFont('times', 'bold');
-        doc.setFontSize(11);
-        doc.text('Peti.PRO', marLeft, marTop);
-        doc.setFont('times', 'normal');
-        doc.text(dataHoje, pageW - marRight, marTop, { align: 'right' });
-        doc.setDrawColor(201, 148, 58);
-        doc.line(marLeft, marTop + 3, pageW - marRight, marTop + 3);
-        doc.setFont('times', 'normal');
-        doc.setFontSize(12);
-        y = marTop + 14;
-      }
-      doc.text(linha, marLeft, y);
-      y += lineH;
-    });
+  $('btn-gerar-trab').onclick = () => {
+    const peds = Array.from($('t-pedidos-list').querySelectorAll('input')).map(i => i.value).join(', ');
+    const dados = {
+      tipo: tipoSelecionado,
+      nome: $('t-nome').value,
+      fatos: $('t-fatos').value,
+      pedido: peds,
+      valor: $('t-valor').value
+    };
+    dispararGeracao(dados);
+  };
 
-    rodape(pagina);
+  /* ─── BIBLIOTECA ─────────────────────────────────────────── */
+  const salvarNoHistorico = (dados, texto) => {
+    let hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    hist.unshift({ dados, texto });
+    localStorage.setItem('petipro_h', JSON.stringify(hist));
+    renderizarBiblioteca();
+  };
 
-    // ── Nome do arquivo ──────────────────────────
-    const tipoSlug = (dadosAtivos.tipo || 'peticao').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    const nomeSlug = (dadosAtivos.nome || 'cliente').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    const d = agora;
-    const dateSlug = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    doc.save(`${tipoSlug}-${nomeSlug}-${dateSlug}.pdf`);
-  });
-
-  /* ─────────────────────────────────────────────────────────────
-     BIBLIOTECA (localStorage — sem limite)
-  ───────────────────────────────────────────────────────────── */
-  function getBiblioteca() {
-    try { return JSON.parse(localStorage.getItem('petipro_historico') || '[]'); }
-    catch { return []; }
-  }
-
-  function setBiblioteca(arr) {
-    localStorage.setItem('petipro_historico', JSON.stringify(arr));
-  }
-
-  function salvarHistorico(dados, texto) {
-    const lib = getBiblioteca();
-    lib.unshift({
-      id:     Date.now(),
-      tipo:   dados.tipo,
-      nome:   dados.nome,
-      data:   new Date().toLocaleDateString('pt-BR'),
-      dados,
-      texto,
-    });
-    setBiblioteca(lib);
-    renderBiblioteca();
-  }
-
-  /* ─── Busca ─────────────────────────────────────────────────── */
-  $('sidebar-search').addEventListener('input', () => renderBiblioteca());
-
-  function getBuscaTermo() {
-    return ($('sidebar-search').value || '').toLowerCase().trim();
-  }
-
-  /* ─── Renderizar ────────────────────────────────────────────── */
-  function renderBiblioteca() {
-    const lib   = getBiblioteca();
-    const termo = getBuscaTermo();
-    const list  = $('sidebar-list');
-
-    // Contador
-    const total = lib.length;
-    $('sidebar-counter').textContent = total ? `${total} petição${total > 1 ? 'ões' : ''}` : '';
-
-    // Filtro
-    const filtrada = termo
-      ? lib.filter(i =>
-          i.nome.toLowerCase().includes(termo) ||
-          i.tipo.toLowerCase().includes(termo)
-        )
-      : lib;
-
-    if (!lib.length) {
-      list.innerHTML = `
-        <div class="sidebar-empty">
-          Nenhuma petição ainda.<br>
-          <a class="sidebar-empty-link" id="link-nova-peticao">Gere sua primeira petição →</a>
-        </div>`;
-      // Attach link after render
-      const lnk = document.getElementById('link-nova-peticao');
-      if (lnk) lnk.addEventListener('click', () => {
-        showScreen('form');
-        sidebarEl.classList.remove('open');
-        overlayEl.classList.remove('open');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-      return;
-    }
-
-    if (!filtrada.length) {
-      list.innerHTML = '<p class="sidebar-empty">Nenhum resultado.</p>';
-      return;
-    }
-
-    list.innerHTML = filtrada.map(item => `
-      <div class="sidebar-item" data-id="${item.id}" tabindex="0">
-        <button class="btn-item-delete" data-del="${item.id}" title="Deletar petição" tabindex="0">✕</button>
-        <div class="sidebar-item-type">${item.tipo}</div>
-        <div class="sidebar-item-name">${item.nome}</div>
-        <div class="sidebar-item-date">${item.data}</div>
-        <div class="item-delete-confirm" id="del-confirm-${item.id}">
-          Deletar esta petição?
-          <div class="item-delete-confirm-btns">
-            <button class="btn-confirm-yes" data-del-yes="${item.id}">Sim</button>
-            <button class="btn-confirm-no"  data-del-no="${item.id}">Não</button>
-          </div>
-        </div>
+  const renderizarBiblioteca = () => {
+    const hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    $('sidebar-counter').textContent = hist.length;
+    $('sidebar-list').innerHTML = hist.map((item, idx) => `
+      <div class="sidebar-item" onclick="carregarHistorico(${idx})">
+        <div class="sidebar-item-type">${item.dados.tipo}</div>
+        <div class="sidebar-item-name">${item.dados.nome}</div>
       </div>
     `).join('');
-  }
-
-  /* ─── Cliques na lista ──────────────────────────────────────── */
-  $('sidebar-list').addEventListener('click', e => {
-    // 1. Botão ✕ (mostrar confirmação)
-    const delBtn = e.target.closest('[data-del]');
-    if (delBtn && !delBtn.dataset.delYes && !delBtn.dataset.delNo) {
-      e.stopPropagation();
-      const id = delBtn.dataset.del;
-      const confirm = document.getElementById(`del-confirm-${id}`);
-      if (confirm) confirm.classList.toggle('visible');
-      return;
-    }
-
-    // 2. Confirmar deleção
-    if (e.target.dataset.delYes) {
-      e.stopPropagation();
-      const id = Number(e.target.dataset.delYes);
-      const lib = getBiblioteca().filter(i => i.id !== id);
-      setBiblioteca(lib);
-      renderBiblioteca();
-      return;
-    }
-
-    // 3. Cancelar deleção
-    if (e.target.dataset.delNo) {
-      e.stopPropagation();
-      const id = e.target.dataset.delNo;
-      const confirm = document.getElementById(`del-confirm-${id}`);
-      if (confirm) confirm.classList.remove('visible');
-      return;
-    }
-
-    // 4. Clicar no item (abrir petição)
-    const card = e.target.closest('.sidebar-item');
-    if (!card) return;
-    const id   = Number(card.dataset.id);
-    const item = getBiblioteca().find(h => h.id === id);
-    if (!item) return;
-    dadosAtivos     = item.dados;
-    textoAtivo      = item.texto;
-    tipoSelecionado = item.tipo;
-    exibirResultado(item.dados, item.texto);
-    sidebarEl.classList.remove('open');
-    overlayEl.classList.remove('open');
-  });
-
-  /* ─── Limpar tudo ───────────────────────────────────────────── */
-  $('btn-clear-hist').addEventListener('click', () => {
-    $('btn-clear-hist').classList.add('hidden');
-    $('clear-confirm').classList.add('visible');
-  });
-
-  $('btn-confirm-no').addEventListener('click', () => {
-    $('clear-confirm').classList.remove('visible');
-    $('btn-clear-hist').classList.remove('hidden');
-  });
-
-  $('btn-confirm-yes').addEventListener('click', () => {
-    setBiblioteca([]);
-    renderBiblioteca();
-    $('clear-confirm').classList.remove('visible');
-    $('btn-clear-hist').classList.remove('hidden');
-  });
-
-  /* ─── Exportar PDF geral (todas as petições) ────────────────── */
-  $('btn-export-pdf').addEventListener('click', () => {
-    const lib = getBiblioteca();
-    if (!lib.length) return;
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-    const marL = 30, marR = 20, marT = 25, marB = 20;
-    const pageW = 210, pageH = 297;
-    const contentW = pageW - marL - marR;
-    const lineH = 7.5;
-    const hoje = new Date().toLocaleDateString('pt-BR');
-
-    const addCabecalho = (p) => {
-      doc.setFont('times','bold'); doc.setFontSize(11);
-      doc.text('Peti.PRO — Biblioteca de Petições', marL, marT);
-      doc.setFont('times','normal');
-      doc.text(hoje, pageW - marR, marT, { align: 'right' });
-      doc.setDrawColor(201,148,58); doc.setLineWidth(0.5);
-      doc.line(marL, marT+3, pageW-marR, marT+3);
-    };
-
-    const addRodape = (p) => {
-      doc.setFont('times','normal'); doc.setFontSize(10);
-      doc.setTextColor(107,107,107);
-      doc.text(String(p), pageW/2, pageH-10, { align:'center' });
-      doc.setTextColor(28,28,28); doc.setFontSize(12);
-    };
-
-    // Índice (página 1)
-    addCabecalho(1);
-    doc.setFont('times','bold'); doc.setFontSize(13); doc.setTextColor(28,28,28);
-    doc.text('Índice', marL, marT+14);
-    doc.setFont('times','normal'); doc.setFontSize(11);
-    let yIdx = marT+24;
-    lib.forEach((item, i) => {
-      if (yIdx > pageH - marB) { addRodape(1); doc.addPage(); yIdx = marT+10; }
-      doc.text(`${i+1}. ${item.tipo} — ${item.nome} (${item.data})`, marL, yIdx);
-      yIdx += 7;
-    });
-    addRodape(1);
-
-    // Uma petição por página
-    lib.forEach((item, i) => {
-      doc.addPage();
-      let pagina = i + 2;
-      addCabecalho(pagina);
-      doc.setFont('times','bold'); doc.setFontSize(12);
-      doc.text(`${item.tipo}`, marL, marT+12);
-      doc.setFont('times','normal'); doc.setFontSize(10); doc.setTextColor(107,107,107);
-      doc.text(`${item.nome} · ${item.data}`, marL, marT+19);
-      doc.setTextColor(28,28,28); doc.setFontSize(12);
-      let y = marT+28;
-      const linhas = doc.splitTextToSize(item.texto, contentW);
-      linhas.forEach(linha => {
-        if (y+lineH > pageH-marB) {
-          addRodape(pagina); doc.addPage(); pagina++;
-          addCabecalho(pagina);
-          y = marT+14;
-        }
-        doc.text(linha, marL, y); y += lineH;
-      });
-      addRodape(pagina);
-    });
-
-    const dateSlug = hoje.split('/').reverse().join('-');
-    doc.save(`peticoes-biblioteca-${dateSlug}.pdf`);
-  });
-
-  /* ─── Exportar Excel ────────────────────────────────────────── */
-  $('btn-export-excel').addEventListener('click', () => {
-    const lib = getBiblioteca();
-    if (!lib.length) return;
-
-    const linhas = lib.map(item => ({
-      'Tipo':            item.tipo,
-      'Cliente':         item.nome,
-      'CPF':             item.dados.cpf    || '',
-      'Parte Contrária': item.dados.contra || '',
-      'Vara / Foro':     item.dados.vara   || '',
-      'Data':            item.data,
-      'Pedido':          item.dados.pedido || '',
-      'Valor (R$)':      item.dados.valor  || '',
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(linhas);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Petições');
-
-    const hoje = new Date();
-    const dateSlug = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
-    XLSX.writeFile(wb, `peticoes-biblioteca-${dateSlug}.xlsx`);
-  });
-
-  /* ─────────────────────────────────────────────────────────────
-     BLOCOS 4+5 — ABAS + CHAT + SIMULAÇÃO
-  ───────────────────────────────────────────────────────────── */
-  let abaAtiva         = 'refinar';
-  let simulacaoDisparada = false;
-
-  // -- históricos separados por aba
-  let historicoRefinar = [];
-  let historicoSimular = [];
-
-  let revisaoDisparada = false;
-
-  // -- estado do ANTES/DEPOIS pendente (refinamento)
-  let pendingAntes   = null;
-  let pendingDepois  = null;
-
-  /* ── Trocar aba ──────────────────────────────────────────── */
-  document.querySelectorAll('.chat-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.chat-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      abaAtiva = btn.dataset.tab;
-
-      $('panel-refinar').classList.add('hidden');
-      $('panel-simular').classList.add('hidden');
-      $('panel-revisar').classList.add('hidden');
-
-      const inp  = $('chat-input');
-      const send = $('btn-chat-send');
-
-      if (abaAtiva === 'refinar') {
-        $('panel-refinar').classList.remove('hidden');
-        inp.placeholder = 'Digite sua instrução…';
-        inp.disabled = false;
-        send.disabled = false;
-      } else if (abaAtiva === 'simular') {
-        $('panel-simular').classList.remove('hidden');
-        inp.placeholder = 'Pergunte sobre os pontos fracos ou peça nova simulação…';
-        inp.disabled = false;
-        send.disabled = false;
-        if (!simulacaoDisparada && textoAtivo) {
-          simulacaoDisparada = true;
-          executarSimulacao('');
-        }
-      } else if (abaAtiva === 'revisar') {
-        $('panel-revisar').classList.remove('hidden');
-        inp.placeholder = 'Análise automática — sem necessidade de digitar';
-        inp.disabled = true;
-        send.disabled = true;
-        if (!revisaoDisparada && textoAtivo) {
-          revisaoDisparada = true;
-          executarRevisao();
-        }
-      }
-    });
-  });
-
-  /* ── Auto-resize textarea ────────────────────────────────── */
-  $('chat-input').addEventListener('input', function () {
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-  });
-
-  /* ── Enter para enviar ───────────────────────────────────── */
-  $('chat-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      despacharInput();
-    }
-  });
-  $('btn-chat-send').addEventListener('click', despacharInput);
-
-  function despacharInput() {
-    if (abaAtiva === 'refinar') enviarRefinamento();
-    else                         executarSimulacao($('chat-input').value.trim());
-  }
-
-  /* ── Helper: escape HTML ─────────────────────────────────── */
-  function escapeHtml(str) {
-    return (str || '')
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  /* ── Adicionar mensagem no histórico visual ──────────────── */
-  function addMsg(histId, cssClass, html) {
-    const hist = $(histId);
-    const div  = document.createElement('div');
-    div.className = `chat-msg ${cssClass}`;
-    div.innerHTML = html;
-    hist.appendChild(div);
-    hist.scrollTop = hist.scrollHeight;
-    // máx 10 mensagens
-    const msgs = hist.querySelectorAll('.chat-msg');
-    if (msgs.length > 10) msgs[0].remove();
-    return div;
-  }
-
-  /* ── Parse ANTES / DEPOIS ────────────────────────────────── */
-  function parseDiff(texto) {
-    const a = texto.match(/ANTES:\s*"([\s\S]*?)"\s*(?:\n|$)/i);
-    const d = texto.match(/DEPOIS:\s*"([\s\S]*?)"\s*(?:\n|$)/i);
-    if (a && d) return { antes: a[1].trim(), depois: d[1].trim() };
-    return null;
-  }
-
-  /* ─────────────────────────────────────────────────────────
-     REFINAMENTO
-  ───────────────────────────────────────────────────────── */
-  async function enviarRefinamento() {
-    const instrucao = $('chat-input').value.trim();
-    if (!instrucao || !textoAtivo) return;
-
-    const btn = $('btn-chat-send');
-    btn.disabled = true;
-    limparInput();
-
-    addMsg('chat-history-refinar', 'chat-msg-user', escapeHtml(instrucao));
-    historicoRefinar.push({ role: 'user', content: instrucao });
-
-    $('chat-analyzing-refinar').classList.add('visible');
-
-    try {
-      const resp = await fetch('/api/gerar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          modo:         'refinamento',
-          peticaoAtual:  textoAtivo,
-          instrucao,
-          historico:     historicoRefinar.slice(-8),
-        }),
-      });
-      const data = await resp.json();
-      $('chat-analyzing-refinar').classList.remove('visible');
-
-      const resposta = data.peticao || data.erro || 'Erro ao processar refinamento.';
-      historicoRefinar.push({ role: 'assistant', content: resposta });
-
-      const diff = parseDiff(resposta);
-      if (diff) {
-        pendingAntes  = diff.antes;
-        pendingDepois = diff.depois;
-        const msgEl = addMsg('chat-history-refinar', 'chat-msg-ai', `
-          <div class="chat-diff">
-            <div class="chat-diff-label">Proposta de alteração</div>
-            <div class="chat-diff-label" style="margin-top:8px">ANTES:</div>
-            <div class="chat-diff-block before">${escapeHtml(diff.antes)}</div>
-            <div class="chat-diff-label">DEPOIS:</div>
-            <div class="chat-diff-block after">${escapeHtml(diff.depois)}</div>
-          </div>
-          <div class="chat-accept-reject" id="chat-ar-${Date.now()}">
-            <button class="btn-accept">✓ Aceitar alteração</button>
-            <button class="btn-reject">✗ Rejeitar</button>
-          </div>`);
-        msgEl.querySelector('.btn-accept').addEventListener('click', () => aceitarAlteracao(msgEl));
-        msgEl.querySelector('.btn-reject').addEventListener('click', () => rejeitarAlteracao(msgEl));
-      } else {
-        addMsg('chat-history-refinar', 'chat-msg-ai', escapeHtml(resposta).replace(/\n/g, '<br>'));
-        pendingAntes = pendingDepois = null;
-      }
-    } catch {
-      $('chat-analyzing-refinar').classList.remove('visible');
-      addMsg('chat-history-refinar', 'chat-msg-ai',
-        'A geração de petições ainda não está ativa nesta instalação. Configure a API key na Vercel.');
-    }
-    btn.disabled = false;
-  }
-
-  function aceitarAlteracao(msgEl) {
-    if (!pendingAntes) return;
-    const novo = textoAtivo.replace(pendingAntes, pendingDepois);
-    textoAtivo = novo;
-    $('result-body').textContent = novo;
-
-    // atualiza no localStorage se tiver ID
-    if (dadosAtivos._id) {
-      const lib = getBiblioteca();
-      const idx = lib.findIndex(i => i.id === dadosAtivos._id);
-      if (idx !== -1) { lib[idx].texto = novo; setBiblioteca(lib); renderBiblioteca(); }
-    }
-
-    msgEl.querySelector('.chat-accept-reject')?.remove();
-    const tag = document.createElement('span');
-    tag.className = 'chat-tag chat-tag-accepted';
-    tag.textContent = '✓ Aceito';
-    msgEl.appendChild(tag);
-    pendingAntes = pendingDepois = null;
-  }
-
-  function rejeitarAlteracao(msgEl) {
-    msgEl.querySelector('.chat-accept-reject')?.remove();
-    const tag = document.createElement('span');
-    tag.className = 'chat-tag chat-tag-rejected';
-    tag.textContent = '✗ Rejeitado';
-    msgEl.appendChild(tag);
-    addMsg('chat-history-refinar', 'chat-msg-status', 'Alteração rejeitada. Pode tentar outra instrução.');
-    pendingAntes = pendingDepois = null;
-  }
-
-  /* ─────────────────────────────────────────────────────────
-     SIMULAR DEFESA
-  ───────────────────────────────────────────────────────── */
-  async function executarSimulacao(instrucao) {
-    if (!textoAtivo) return;
-
-    const btn = $('btn-chat-send');
-    btn.disabled = true;
-    if (instrucao) {
-      limparInput();
-      addMsg('chat-history-simular', 'chat-msg-user', escapeHtml(instrucao));
-      historicoSimular.push({ role: 'user', content: instrucao });
-    }
-
-    $('chat-analyzing-simular').classList.add('visible');
-
-    try {
-      const resp = await fetch('/api/gerar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          modo:         'simulacao',
-          peticaoAtual:  textoAtivo,
-          instrucao:     instrucao || '',
-          historico:     historicoSimular.slice(-6),
-        }),
-      });
-      const data = await resp.json();
-      $('chat-analyzing-simular').classList.remove('visible');
-
-      const resposta = data.peticao || data.erro || 'Erro ao processar simulação.';
-      historicoSimular.push({ role: 'assistant', content: resposta });
-
-      addMsg('chat-history-simular', 'chat-msg-ai',
-        escapeHtml(resposta).replace(/\n/g, '<br>'));
-
-      // Mostrar botão "Corrigir pontos fracos" após primeira simulação automática
-      if (!instrucao) {
-        $('chat-corrigir').classList.remove('hidden');
-      }
-    } catch {
-      $('chat-analyzing-simular').classList.remove('visible');
-      addMsg('chat-history-simular', 'chat-msg-ai',
-        'A geração de petições ainda não está ativa nesta instalação. Configure a API key na Vercel.');
-    }
-    btn.disabled = false;
-  }
-
-  /* ── Botão "Corrigir pontos fracos" (Simular) ───────────── */
-  $('btn-corrigir').addEventListener('click', () => {
-    $('tab-refinar').click();
-    const inp = $('chat-input');
-    inp.value = 'Corrija os pontos fracos identificados na simulação de defesa';
-    inp.style.height = 'auto';
-    inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
-    inp.focus();
-  });
-
-  /* ─────────────────────────────────────────────────────────
-     REVISAR (anti-alucinação)
-  ───────────────────────────────────────────────────────── */
-  async function executarRevisao() {
-    if (!textoAtivo) return;
-    const btn = $('btn-chat-send');
-    btn.disabled = true;
-    $('chat-analyzing-revisar').classList.add('visible');
-
-    try {
-      const resp = await fetch('/api/gerar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          modo:         'revisao',
-          peticaoAtual:  textoAtivo,
-        }),
-      });
-      const data = await resp.json();
-      $('chat-analyzing-revisar').classList.remove('visible');
-
-      const resposta = data.peticao || data.erro || 'Erro ao processar revisão.';
-      addMsg('chat-history-revisar', 'chat-msg-ai',
-        escapeHtml(resposta).replace(/\n/g, '<br>'));
-      $('chat-corrigir-revisar').classList.remove('hidden');
-    } catch {
-      $('chat-analyzing-revisar').classList.remove('visible');
-      addMsg('chat-history-revisar', 'chat-msg-ai',
-        'A geração de petições ainda não está ativa nesta instalação. Configure a API key na Vercel.');
-    }
-    btn.disabled = abaAtiva === 'revisar'; // mantém desabilitado se aba revisar ainda ativa
-  }
-
-  /* ── Botão "Corrigir tudo automaticamente" (Revisar) ─────── */
-  $('btn-corrigir-revisar').addEventListener('click', () => {
-    $('tab-refinar').click();
-    const inp = $('chat-input');
-    inp.value = 'Corrija todos os problemas identificados na revisão técnica';
-    inp.style.height = 'auto';
-    inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
-    inp.focus();
-  });
-
-  /* ── Limpar input ────────────────────────────────────────── */
-  function limparInput() {
-    const inp = $('chat-input');
-    inp.value = '';
-    inp.style.height = 'auto';
-  }
-
-  /* ── Reset completo ao Nova Petição ─────────────────────── */
-  function resetChat() {
-    abaAtiva           = 'refinar';
-    simulacaoDisparada = false;
-    revisaoDisparada   = false;
-    historicoRefinar   = [];
-    historicoSimular   = [];
-    pendingAntes = pendingDepois = null;
-
-    $('chat-history-refinar').innerHTML  = '';
-    $('chat-history-simular').innerHTML  = '';
-    $('chat-history-revisar').innerHTML  = '';
-    $('chat-analyzing-refinar').classList.remove('visible');
-    $('chat-analyzing-simular').classList.remove('visible');
-    $('chat-analyzing-revisar').classList.remove('visible');
-    $('chat-corrigir').classList.add('hidden');
-    $('chat-corrigir-revisar').classList.add('hidden');
-
-    $('panel-refinar').classList.remove('hidden');
-    $('panel-simular').classList.add('hidden');
-    $('panel-revisar').classList.add('hidden');
-
-    document.querySelectorAll('.chat-tab').forEach(b => b.classList.remove('active'));
-    $('tab-refinar').classList.add('active');
-
-    const inp = $('chat-input');
-    limparInput();
-    inp.disabled = false;
-    inp.placeholder = 'Digite sua instrução…';
-    $('btn-chat-send').disabled = false;
-  }
-
-  /* ─────────────────────────────────────────────────────────────
-     BLOCO 6 — MODAL TRIAL
-  ───────────────────────────────────────────────────────────── */
-  function openModal() {
-    const m = $('modal-trial');
-    m.classList.add('open');
-    $('modal-form-content').style.display = '';
-    $('modal-success').style.display = 'none';
-    $('modal-contact').value = '';
-    setTimeout(() => $('modal-contact').focus(), 120);
-  }
-
-  function closeModal() {
-    $('modal-trial').classList.remove('open');
-  }
-
-  $('btn-trial').addEventListener('click', openModal);
-  $('modal-close').addEventListener('click', closeModal);
-  $('modal-trial').addEventListener('click', e => {
-    if (e.target === $('modal-trial')) closeModal();
-  });
-
-  $('modal-submit').addEventListener('click', () => {
-    const contato = $('modal-contact').value.trim();
-    if (!contato) {
-      $('modal-contact').focus();
-      return;
-    }
-    // Por enquanto apenas mostra a confirmação (backend será implementado)
-    $('modal-form-content').style.display = 'none';
-    $('modal-success').style.display = 'block';
-  });
-
-  $('modal-contact').addEventListener('keydown', e => {
-    if (e.key === 'Enter') $('modal-submit').click();
-  });
-
-  /* ─────────────────────────────────────────────────────────────
-     INIT
-  ───────────────────────────────────────────────────────────── */
-  showScreen('form');
-  renderBiblioteca();
-
-  /* === TRABALHISTA JS === */
-  var tipoParte = 'pf';
-  function setTipoParte(tipo) {
-    tipoParte = tipo;
-    var isPF = tipo === 'pf';
-    document.getElementById('t-btn-pf').classList.toggle('active', isPF);
-    document.getElementById('t-btn-pj').classList.toggle('active', !isPF);
-    var ecWrap = document.getElementById('t-wrap-contra-ec');
-    if (ecWrap) ecWrap.classList.toggle('hidden', !isPF);
-    document.getElementById('t-label-contra-nome').textContent = isPF ? 'Nome completo' : 'Raz\u00e3o Social';
-    var lDoc = document.getElementById('t-label-contra-doc');
-    var iDoc = document.getElementById('t-contra-doc');
-    if (isPF) { lDoc.textContent = 'CPF'; iDoc.placeholder = '000.000.000-00'; iDoc.maxLength = 14; }
-    else { lDoc.textContent = 'CNPJ'; iDoc.placeholder = '00.000.000/0000-00'; iDoc.maxLength = 18; iDoc.value = ''; }
-  }
-  document.getElementById('t-btn-pf').addEventListener('click', function(){ setTipoParte('pf'); });
-  document.getElementById('t-btn-pj').addEventListener('click', function(){ setTipoParte('pj'); });
-
-  function maskCPF(v) {
-    v = v.replace(/\\D/g,'').slice(0,11);
-    if(v.length>9) v=v.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{1,2})/,'$1.$2.$3-$4');
-    else if(v.length>6) v=v.replace(/(\\d{3})(\\d{3})(\\d{1,3})/,'$1.$2.$3');
-    else if(v.length>3) v=v.replace(/(\\d{3})(\\d{1,3})/,'$1.$2');
-    return v;
-  }
-  function maskCNPJ(v) {
-    v = v.replace(/\\D/g,'').slice(0,14);
-    if(v.length>12) v=v.replace(/(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{1,2})/,'$1.$2.$3/$4-$5');
-    else if(v.length>8) v=v.replace(/(\\d{2})(\\d{3})(\\d{3})(\\d{1,4})/,'$1.$2.$3/$4');
-    else if(v.length>5) v=v.replace(/(\\d{2})(\\d{3})(\\d{1,3})/,'$1.$2.$3');
-    else if(v.length>2) v=v.replace(/(\\d{2})(\\d{1,3})/,'$1.$2');
-    return v;
-  }
-  document.getElementById('t-cpf').addEventListener('input', function(){ this.value = maskCPF(this.value); });
-  document.getElementById('t-contra-doc').addEventListener('input', function(){ this.value = tipoParte==='pf' ? maskCPF(this.value) : maskCNPJ(this.value); });
-  document.getElementById('t-valor').addEventListener('input', function(){
-    var v = this.value.replace(/\\D/g,'');
-    if(!v){ this.value=''; return; }
-    v = (parseInt(v,10)/100).toFixed(2);
-    this.value = v.replace('.',',').replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');
-  });
-
-  function addPedido() {
-    var list = document.getElementById('t-pedidos-list');
-    var num = list.querySelectorAll('.pedido-item').length + 1;
-    var div = document.createElement('div');
+  };
+
+  window.carregarHistorico = idx => {
+    const hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    const item = hist[idx];
+    textoAtivo = item.texto;
+    $('result-tipo').textContent = item.dados.tipo;
+    $('result-body').textContent = textoAtivo;
+    showScreen('result');
+  };
+
+  /* ─── UI BÁSICA ───────────────────────────────────────────── */
+  $('btn-hamburger').onclick = () => {
+    $('sidebar').classList.toggle('open');
+    $('sidebar-overlay').classList.toggle('open');
+  };
+  $('sidebar-overlay').onclick = () => {
+    $('sidebar').classList.remove('open');
+    $('sidebar-overlay').classList.remove('open');
+  };
+  $('btn-add-pedido').onclick = () => {
+    const div = document.createElement('div');
     div.className = 'pedido-item';
-    div.innerHTML = '<span class="pedido-num">'+num+'.</span><input type="text" placeholder="Descreva o pedido\u2026" /><button class="btn-pedido-action" type="button" title="Remover">\u00d7</button>';
-    div.querySelector('button').addEventListener('click', function(){
-      div.remove();
-      document.getElementById('t-pedidos-list').querySelectorAll('.pedido-item').forEach(function(el,i){ el.querySelector('.pedido-num').textContent=(i+1)+'.'; });
-    });
-    list.appendChild(div);
-    div.querySelector('input').focus();
-  }
-  document.getElementById('btn-add-pedido').addEventListener('click', addPedido);
-  document.getElementById('t-upload-zone').addEventListener('click', function(){ document.getElementById('t-upload').click(); });
-  document.getElementById('t-upload').addEventListener('change', function(){
-    document.getElementById('t-upload-text').innerHTML = this.files.length
-      ? '<strong>'+this.files.length+' arquivo(s) selecionado(s)</strong>'
-      : '<strong>Clique para anexar</strong> ou arraste os arquivos';
-  });
-  ['t-nome','t-cpf','t-fatos'].forEach(function(id){ document.getElementById(id).addEventListener('input', function(){ this.classList.remove('error'); }); });
+    div.innerHTML = '<input type="text" placeholder="Outro pedido..." />';
+    $('t-pedidos-list').appendChild(div);
+  };
+  $('btn-copiar').onclick = () => {
+    navigator.clipboard.writeText(textoAtivo);
+    $('btn-copiar').textContent = 'Copiado!';
+    setTimeout(() => $('btn-copiar').textContent = 'Copiar Texto', 2000);
+  };
+  $('btn-nova').onclick = () => {
+    showScreen('form');
+  };
 
-  function validarTrab() {
-    var ok=true;
-    [['t-nome','t-erro-nome'],['t-cpf','t-erro-cpf'],['t-fatos','t-erro-fatos']].forEach(function(pair){
-      var el=document.getElementById(pair[0]), er=document.getElementById(pair[1]);
-      if(!el.value.trim()){el.classList.add('error');er.classList.add('visible');ok=false;}
-      else{el.classList.remove('error');er.classList.remove('visible');}
-    });
-    var peds=Array.from(document.getElementById('t-pedidos-list').querySelectorAll('input[type=text]')).map(function(i){return i.value.trim();}).filter(Boolean);
-    var erP=document.getElementById('t-erro-pedido');
-    if(!peds.length){erP.classList.add('visible');ok=false;}else{erP.classList.remove('visible');}
-    return ok;
-  }
-
-  document.getElementById('btn-gerar-trab').addEventListener('click', async function(){
-    if(!tipoSelecionado||!validarTrab()) return;
-    var peds=Array.from(document.getElementById('t-pedidos-list').querySelectorAll('input[type=text]')).map(function(inp,i){return(i+1)+'. '+inp.value.trim();}).filter(function(p){return p.length>3;}).join('\\n');
-    var aud=document.querySelector('input[name="t-audiencia"]:checked');
-    dadosAtivos={
-      tipo:tipoSelecionado,
-      nome:document.getElementById('t-nome').value.trim(),
-      cpf:document.getElementById('t-cpf').value.trim(),
-      estadoCivil:document.getElementById('t-estado-civil').value,
-      profissao:document.getElementById('t-profissao').value.trim(),
-      enderecoCliente:document.getElementById('t-endereco').value.trim(),
-      tipoParte:tipoParte,
-      contra:document.getElementById('t-contra-nome').value.trim(),
-      contraEstadoCivil:tipoParte==='pf'?document.getElementById('t-contra-estado-civil').value:'',
-      contraDoc:document.getElementById('t-contra-doc').value.trim(),
-      contraEndereco:document.getElementById('t-contra-endereco').value.trim(),
-      vara:document.getElementById('t-vara').value.trim(),
-      fatos:document.getElementById('t-fatos').value.trim(),
-      fundamentosJuridicos:document.getElementById('t-fundamentos').value.trim(),
-      pedido:peds,
-      audienciaConciliacao:aud?aud.value:'sim',
-      valor:document.getElementById('t-valor').value.trim(),
-    };
-    var btn=document.getElementById('btn-gerar-trab');
-    btn.disabled=true; btn.textContent='Gerando\u2026';
-    showScreen('loading');
-    try{
-      var resp=await fetch('/api/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(dadosAtivos)});
-      var data=await resp.json();
-      if(data.peticao){textoAtivo=data.peticao;salvarHistorico(dadosAtivos,textoAtivo);}
-      else{textoAtivo=data.erro||'Erro ao gerar. Tente novamente.';}
-    }catch(e){textoAtivo='Erro de conex\u00e3o.';}
-    exibirResultado(dadosAtivos,textoAtivo);
-    btn.disabled=false; btn.textContent='Gerar peti\u00e7\u00e3o \u2192';
-  });
+  // Init
+  aplicarMascaras();
+  renderizarBiblioteca();
 </script>
 </body>
 </html>

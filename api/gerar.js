@@ -1,224 +1,102 @@
-// api/gerar.js — Peti.PRO (Conecte.se)
-// Suporta 4 modos: geração, refinamento, simulacao, revisao
+import Anthropic from '@anthropic-ai/sdk';
+import { verify } from './_lib/hmac.js';
+import { setCorsHeaders, handleOptions } from './_lib/cors.js';
+import { checkRateLimit } from './_lib/rate-limit.js';
+import { validatePayload } from './_lib/schema.js';
+import { sanitizeField } from './_lib/sanitize.js';
+import { getSystemPrompt, buildMessages } from './_lib/prompts.js';
 
-const Anthropic = require('@anthropic-ai/sdk');
+const MODEL = 'claude-sonnet-4-6';
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const MODEL_CONFIG = {
+  geracao:     { max_tokens: 4000, temperature: 0.3 },
+  refinamento: { max_tokens: 1500, temperature: 0.4 },
+  simulacao:   { max_tokens: 2000, temperature: 0.5 },
+  revisao:     { max_tokens: 2000, temperature: 0.2 },
+};
 
-// ─── System prompts por modo ──────────────────────────────────────────────────
+// Fábrica que aceita client injetado (facilita testes)
+export function createHandler(anthropicClient) {
+  return async function handler(req, res) {
+    setCorsHeaders(req, res);
+    if (handleOptions(req, res)) return;
 
-const PROMPT_GERACAO = `Você é um advogado brasileiro sênior especialista em redação de petições jurídicas.
-Escreva petições completas, formais e tecnicamente precisas, seguindo todas as normas do ordenamento jurídico brasileiro.
-Inclua: endereçamento correto, qualificação das partes, dos fatos, fundamentos jurídicos (com artigos de lei e jurisprudência pertinente), pedidos detalhados, valor da causa e fecho formal.
-Linguagem: formal, objetiva, técnica. Sem introduções ou explicações — apenas a petição pronta.`;
+    if (req.method !== 'POST') {
+      return res.status(405).json({ erro: 'Método não permitido.' });
+    }
 
-const PROMPT_REFINAMENTO = `Você está refinando uma petição jurídica brasileira já existente.
-Mostre APENAS o trecho que precisa ser alterado.
-Formato obrigatório da resposta:
+    // ── Autenticação ──────────────────────────────────────────────────────────
+    const authHeader = req.headers['authorization'] || '';
+    const rawToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    const secret = process.env.SESSION_SECRET;
 
-ANTES:
-"[trecho original entre aspas]"
+    if (!secret || !rawToken) {
+      return res.status(401).json({ erro: 'Sessão inválida ou expirada. Recarregue a página.' });
+    }
 
-DEPOIS:
-"[trecho novo entre aspas]"
+    const tokenPayload = verify(rawToken, secret);
+    if (!tokenPayload || tokenPayload.trial_until < Date.now()) {
+      return res.status(401).json({ erro: 'Sessão inválida ou expirada. Recarregue a página.' });
+    }
 
-Nada além disso. Sem explicações, sem introdução.
-Se a instrução for uma pergunta e não uma alteração, responda em texto simples sem o formato ANTES/DEPOIS.`;
+    // ── Rate limit ────────────────────────────────────────────────────────────
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+      || req.socket?.remoteAddress
+      || 'unknown';
 
-const PROMPT_SIMULACAO = `Você é o advogado da parte adversária analisando uma petição jurídica brasileira para encontrar vulnerabilidades e construir a melhor defesa possível.
+    const rl = checkRateLimit(ip, 'gerar', { hourLimit: 10, dayLimit: 50 });
+    if (!rl.allowed) {
+      res.setHeader('Retry-After', String(rl.retryAfter));
+      return res.status(429).json({
+        erro: `Muitas requisições. Aguarde ${rl.retryAfter} segundos.`,
+      });
+    }
 
-Sua missão: identificar todos os pontos fracos, argumentos contestáveis, ausência de provas, valores sem memória de cálculo, e qualquer brecha que um bom advogado adversário exploraria.
+    // ── Validação de schema ───────────────────────────────────────────────────
+    const parsed = validatePayload(req.body);
+    if (!parsed.success) {
+      const msg = parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join('; ');
+      return res.status(400).json({ erro: `Dados inválidos: ${msg}`, codigo: 400 });
+    }
 
-Classifique cada ponto como:
-🔴 RISCO ALTO — pode comprometer o resultado
-🟡 RISCO MÉDIO — enfraquece mas não derruba
-🟢 PONTO SÓLIDO — bem fundamentado, difícil de atacar
+    const data = parsed.data;
+    const modo = data.modo || 'geracao';
 
-Para cada ponto fraco, ofereça uma sugestão direta de como o advogado autor pode se fortalecer.
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({ erro: 'Serviço temporariamente indisponível. Tente em instantes.' });
+    }
 
-Se a mensagem for uma pergunta ou instrução específica sobre a simulação, responda no contexto do papel de advogado adversário.
+    // ── Chamada Claude ────────────────────────────────────────────────────────
+    try {
+      const config = MODEL_CONFIG[modo] || MODEL_CONFIG.geracao;
+      const messages = buildMessages(modo, data, sanitizeField);
 
-Seja direto, técnico e honesto. O advogado precisa saber a verdade sobre a petição antes de protocolar.`;
-
-const PROMPT_REVISAO = `Você é um revisor jurídico técnico independente.
-Releia esta petição como se não tivesse escrito — sem viés de confirmação, sem defender as escolhas feitas. Seu único objetivo é encontrar problemas.
-
-Verifique obrigatoriamente:
-1. Artigos de lei citados — estão corretos e aplicáveis?
-2. Jurisprudência — está atualizada e pertinente?
-3. Estrutura — todos os elementos obrigatórios presentes?
-4. Coerência — os fatos sustentam os pedidos?
-5. Pedidos — têm fundamentação legal adequada?
-6. Valor da causa — tem memória de cálculo ou é arbitrário?
-7. Contradições — há alguma afirmação que contradiz outra?
-
-Para cada problema encontrado:
-- Descreva o problema claramente
-- Cite o trecho exato com o erro
-- Sugira a correção
-
-Para cada item verificado sem problemas:
-- Confirme que está correto com ✓
-
-Seja implacável. O advogado precisa saber a verdade antes de protocolar — não depois.`;
-
-// ─── Handler principal ────────────────────────────────────────────────────────
-
-module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ erro: 'Método não permitido.' });
-  }
-
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return res.status(500).json({
-      erro: 'A geração de petições ainda não está ativa nesta instalação. Para ativar, configure sua chave de API nas variáveis de ambiente da Vercel. Dúvidas? Fale com a Conecte.se.',
-    });
-  }
-
-  const body = req.body;
-  const { modo } = body;
-
-  try {
-    // ── MODO: REFINAMENTO ──────────────────────────────────────────────────────
-    if (modo === 'refinamento') {
-      const { peticaoAtual, instrucao, historico = [] } = body;
-
-      const messages = [
-        ...historico.map(m => ({ role: m.role, content: m.content })),
-        {
-          role: 'user',
-          content: `Petição atual:\n\n${peticaoAtual}\n\n---\nInstrução: ${instrucao}`,
-        },
-      ];
-
-      const response = await client.messages.create({
-        model: 'claude-opus-4-5',
-        max_tokens: 1024,
-        system: PROMPT_REFINAMENTO,
+      const response = await anthropicClient.messages.create({
+        model: MODEL,
+        max_tokens: config.max_tokens,
+        temperature: config.temperature,
+        system: getSystemPrompt(modo),
         messages,
       });
 
       return res.status(200).json({ peticao: response.content[0].text });
+
+    } catch (err) {
+      const status = err?.status;
+      const name = err?.name || 'Error';
+      const firstLine = String(err?.message || '').split('\n')[0].slice(0, 120);
+      console.error({ status, name, firstLine });
+
+      if (status === 529 || status === 503) {
+        return res.status(503).json({ erro: 'Serviço temporariamente indisponível. Tente em instantes.' });
+      }
+      if (status === 429) {
+        return res.status(429).json({ erro: 'Muitas requisições. Aguarde e tente novamente.' });
+      }
+      return res.status(500).json({ erro: 'Erro interno. Nossa equipe já foi notificada.' });
     }
+  };
+}
 
-    // ── MODO: SIMULAÇÃO DE DEFESA ──────────────────────────────────────────────
-    if (modo === 'simulacao') {
-      const { peticaoAtual, instrucao = '', historico = [] } = body;
-
-      const userMsg = instrucao
-        ? `Instrução adicional: ${instrucao}`
-        : `Analise esta petição como advogado adversário:\n\n${peticaoAtual}`;
-
-      const messages = [
-        { role: 'user', content: `Petição a ser analisada:\n\n${peticaoAtual}` },
-        ...historico
-          .filter((_, i) => i > 0) // pula primeira msg se já incluímos a petição
-          .map(m => ({ role: m.role, content: m.content })),
-      ];
-
-      // Se é a primeira mensagem (sem histórico), montar direto
-      const msgs = historico.length === 0
-        ? [{ role: 'user', content: `Analise esta petição como advogado adversário:\n\n${peticaoAtual}` }]
-        : [
-            ...historico.map(m => ({ role: m.role, content: m.content })),
-            instrucao ? { role: 'user', content: instrucao } : null,
-          ].filter(Boolean);
-
-      const response = await client.messages.create({
-        model: 'claude-opus-4-5',
-        max_tokens: 2048,
-        system: PROMPT_SIMULACAO,
-        messages: msgs,
-      });
-
-      return res.status(200).json({ peticao: response.content[0].text });
-    }
-
-    // ── MODO: REVISÃO TÉCNICA ──────────────────────────────────────────────────
-    if (modo === 'revisao') {
-      const { peticaoAtual } = body;
-
-      const response = await client.messages.create({
-        model: 'claude-opus-4-5',
-        max_tokens: 2048,
-        system: PROMPT_REVISAO,
-        messages: [
-          { role: 'user', content: `Revise esta petição:\n\n${peticaoAtual}` },
-        ],
-      });
-
-      return res.status(200).json({ peticao: response.content[0].text });
-    }
-
-    // ── MODO: GERAÇÃO INICIAL (padrão) ─────────────────────────────────────────
-    const {
-      tipo   = '',
-      nome   = '',
-      cpf    = '',
-      estadoCivil = '',
-      profissao = '',
-      enderecoCliente = '',
-      tipoParte = '',
-      contra = '',
-      contraEstadoCivil = '',
-      contraDoc = '',
-      contraEndereco = '',
-      vara   = '',
-      fatos  = '',
-      fundamentosJuridicos = '',
-      pedido = '',
-      audienciaConciliacao = '',
-      valor  = '',
-    } = body;
-
-    // Monta qualificação completa se campos trabalhistas presentes
-    const qualCliente = [
-      nome,
-      estadoCivil ? `estado civil: ${estadoCivil}` : '',
-      profissao ? `profissão: ${profissao}` : '',
-      cpf ? `CPF: ${cpf}` : '',
-      enderecoCliente ? `endereço: ${enderecoCliente}` : '',
-    ].filter(Boolean).join(', ');
-
-    const tipoContra = tipoParte === 'pj' ? 'Pessoa Jurídica' : 'Pessoa Física';
-    const qualContra = [
-      contra || 'não informado',
-      tipoParte ? `(${tipoContra})` : '',
-      contraEstadoCivil ? `estado civil: ${contraEstadoCivil}` : '',
-      contraDoc ? `CPF/CNPJ: ${contraDoc}` : '',
-      contraEndereco ? `endereço: ${contraEndereco}` : '',
-    ].filter(Boolean).join(', ');
-
-    const userPrompt = `
-Tipo de petição: ${tipo}
-Cliente: ${qualCliente}
-Parte contrária: ${qualContra}
-Vara / Foro: ${vara || 'não informado'}
-${audienciaConciliacao ? `Requer audiência de conciliação: ${audienciaConciliacao === 'sim' ? 'Sim' : 'Não'}` : ''}
-
-FATOS:
-${fatos}
-${fundamentosJuridicos ? `\nFUNDAMENTOS JURÍDICOS INDICADOS PELO ADVOGADO:\n${fundamentosJuridicos}` : ''}
-
-PEDIDO:
-${pedido}
-${valor ? `\nValor da causa: R$ ${valor}` : ''}
-
-Redija a petição completa.`.trim();
-
-    const response = await client.messages.create({
-      model: 'claude-opus-4-5',
-      max_tokens: 4096,
-      system: PROMPT_GERACAO,
-      messages: [{ role: 'user', content: userPrompt }],
-    });
-
-    return res.status(200).json({ peticao: response.content[0].text });
-
-  } catch (err) {
-    console.error('Erro na API Anthropic:', err);
-    return res.status(500).json({
-      erro: `Erro ao gerar petição: ${err.message || 'Erro desconhecido'}`,
-    });
-  }
-};
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+export default createHandler(client);

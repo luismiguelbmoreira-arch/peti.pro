@@ -1,8 +1,16 @@
 {
   "name": "petipro",
-  "version": "1.0.0",
-  "description": "Peti.PRO — Peticoes em segundos. Um produto da Conecte.se.",
+  "version": "2.0.0",
+  "description": "Peti.PRO — Petições em segundos. Um produto da Conecte.se.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/*.mjs"
+  },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0"
+    "@anthropic-ai/sdk": "0.39.0",
+    "zod": "3.23.8"
   }
 }

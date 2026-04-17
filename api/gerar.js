@@ -88,25 +88,40 @@ export function createHandler(anthropicClient) {
       ? { ...parsed.data, ...formatParties(parsed.data) }
       : parsed.data;
 
-    // ── Chamada Claude ────────────────────────────────────────────────────────
+    // ── Chamada Claude (SSE streaming) ───────────────────────────────────────
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('X-Accel-Buffering', 'no');
+
     try {
       const config = MODEL_CONFIG[modo] || MODEL_CONFIG.geracao;
-      const response = await anthropicClient.messages.create({
+      const stream = await anthropicClient.messages.create({
         model: MODEL,
         max_tokens: config.max_tokens,
         temperature: config.temperature,
         system: getSystemPrompt(modo),
         messages: buildMessages(modo, data),
+        stream: true,
       });
-      return res.status(200).json({ peticao: response.content[0].text });
+
+      for await (const event of stream) {
+        if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
+          res.write(`data: ${JSON.stringify({ t: event.delta.text })}\n\n`);
+        }
+      }
+
+      res.write('data: [DONE]\n\n');
 
     } catch (err) {
       const status = err?.status;
       console.error({ status, name: err?.name || 'Error', firstLine: String(err?.message || '').split('\n')[0].slice(0, 120) });
-      if (status === 529 || status === 503) return res.status(503).json({ erro: 'Serviço temporariamente indisponível. Tente em instantes.' });
-      if (status === 429) return res.status(429).json({ erro: 'Muitas requisições. Aguarde e tente novamente.' });
-      return res.status(500).json({ erro: 'Erro interno. Nossa equipe já foi notificada.' });
+      let msg = 'Erro interno. Nossa equipe já foi notificada.';
+      if (status === 529 || status === 503) msg = 'Serviço temporariamente indisponível. Tente em instantes.';
+      else if (status === 429) msg = 'Muitas requisições. Aguarde e tente novamente.';
+      res.write(`event: error\ndata: ${JSON.stringify({ erro: msg })}\n\n`);
     }
+
+    res.end();
   };
 }
 

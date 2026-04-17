@@ -557,15 +557,17 @@
 
   /* ─── BIBLIOTECA ─────────────────────────────────────────── */
   const salvarNoHistorico = (dados, texto) => {
-    let hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    let hist = getHistorico();
     hist.unshift({ dados, texto });
     if (hist.length > 50) hist = hist.slice(0, 50);
     localStorage.setItem('petipro_h', JSON.stringify(hist));
     renderizarBiblioteca();
   };
 
+  const getHistorico = () => JSON.parse(localStorage.getItem('petipro_h') || '[]');
+
   const renderizarBiblioteca = () => {
-    const hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    const hist = getHistorico();
     const q = $('sidebar-search').value.toLowerCase();
     const filtrado = q
       ? hist.filter(h => (h.dados.tipo || '').toLowerCase().includes(q) || (h.dados.nome || '').toLowerCase().includes(q))
@@ -581,11 +583,12 @@
   };
 
   window.carregarHistorico = idx => {
-    const hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    const hist = getHistorico();
     const item = hist[idx];
     if (!item) return;
     textoAtivo = item.texto;
     dadosAtivos = item.dados;
+    tipoSelecionado = item.dados.tipo || '';
     chatHistorico = [];
     $('result-tipo').textContent = item.dados.tipo || 'Petição';
     $('result-body').textContent = textoAtivo;
@@ -594,58 +597,54 @@
   };
 
   window.deletarHistorico = idx => {
-    let hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    let hist = getHistorico();
     hist.splice(idx, 1);
     localStorage.setItem('petipro_h', JSON.stringify(hist));
     renderizarBiblioteca();
   };
 
   /* ─── PDF ────────────────────────────────────────────────── */
-  const exportarPDF = (titulo, texto) => {
+  const criarDocPDF = () => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const margin = 25;
     const maxW = doc.internal.pageSize.getWidth() - margin * 2;
-    doc.setFontSize(13); doc.setFont('helvetica', 'bold');
-    doc.text(titulo, margin, margin);
-    doc.setFontSize(11); doc.setFont('helvetica', 'normal');
-    const lines = doc.splitTextToSize(texto, maxW);
-    let y = margin + 10;
     const pageH = doc.internal.pageSize.getHeight() - margin;
-    for (const line of lines) {
-      if (y + 6 > pageH) { doc.addPage(); y = margin; }
-      doc.text(line, margin, y); y += 6;
-    }
+    const addSection = (titulo, texto, y0 = margin) => {
+      let y = y0;
+      doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+      doc.text(titulo, margin, y); y += 8;
+      doc.setFontSize(11); doc.setFont('helvetica', 'normal');
+      for (const line of doc.splitTextToSize(texto, maxW)) {
+        if (y + 6 > pageH) { doc.addPage(); y = margin; }
+        doc.text(line, margin, y); y += 6;
+      }
+    };
+    return { doc, addSection };
+  };
+
+  const exportarPDF = (titulo, texto) => {
+    const { doc, addSection } = criarDocPDF();
+    addSection(titulo, texto);
     doc.save(`${titulo.replace(/[^a-z0-9]/gi, '_')}.pdf`);
   };
 
   $('btn-pdf').onclick = () => { if (textoAtivo) exportarPDF(dadosAtivos.tipo || 'Petição', textoAtivo); };
 
   $('btn-export-pdf').onclick = () => {
-    const hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    const hist = getHistorico();
     if (!hist.length) { showErro('Biblioteca vazia.'); return; }
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const margin = 25;
-    const maxW = doc.internal.pageSize.getWidth() - margin * 2;
-    const pageH = doc.internal.pageSize.getHeight() - margin;
+    const { doc, addSection } = criarDocPDF();
     hist.forEach((item, i) => {
       if (i > 0) doc.addPage();
-      let y = margin;
-      doc.setFontSize(13); doc.setFont('helvetica', 'bold');
-      doc.text(item.dados.tipo || 'Petição', margin, y); y += 8;
-      doc.setFontSize(11); doc.setFont('helvetica', 'normal');
-      for (const line of doc.splitTextToSize(item.texto, maxW)) {
-        if (y + 6 > pageH) { doc.addPage(); y = margin; }
-        doc.text(line, margin, y); y += 6;
-      }
+      addSection(item.dados.tipo || 'Petição', item.texto);
     });
     doc.save('biblioteca_peti_pro.pdf');
   };
 
   /* ─── EXCEL ──────────────────────────────────────────────── */
   $('btn-export-excel').onclick = () => {
-    const hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    const hist = getHistorico();
     if (!hist.length) { showErro('Biblioteca vazia.'); return; }
     const rows = hist.map(item => ({
       Tipo: item.dados.tipo || '',

@@ -25,6 +25,8 @@ process.env.NODE_ENV ??= 'development';
 const { default: gerarHandler } = await import('./api/gerar.js');
 const { default: sessionHandler } = await import('./api/session.js');
 
+const indexHtml = readFileSync('./index.html');
+
 // Adapta o IncomingMessage/ServerResponse nativo para a interface Express-like dos handlers
 function makeReq(native, body) {
   return Object.assign(native, {
@@ -58,9 +60,8 @@ createServer(async (req, res) => {
 
   // Serve index.html
   if (req.method === 'GET' && (path === '/' || path === '/index.html')) {
-    const html = readFileSync('./index.html');
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(html);
+    res.end(indexHtml);
     return;
   }
 

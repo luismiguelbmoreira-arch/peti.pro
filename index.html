@@ -188,6 +188,8 @@
     <button class="btn-primary" style="padding: 8px 16px; font-size: 13px;">7 dias grátis</button>
   </header>
 
+  <div id="error-banner" style="display:none;background:#c0392b;color:#fff;padding:12px 32px;font-size:13px;font-weight:500;"></div>
+
   <div class="body-row">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
     <aside class="sidebar" id="sidebar">
@@ -200,7 +202,10 @@
       </div>
       <div class="sidebar-list" id="sidebar-list"></div>
       <div class="sidebar-footer">
-        <button class="btn-sidebar" id="btn-export-pdf">PDF Geral</button>
+        <div class="sidebar-export-row">
+          <button class="btn-sidebar" id="btn-export-pdf">PDF Geral</button>
+          <button class="btn-sidebar" id="btn-export-excel">Excel</button>
+        </div>
         <button class="btn-sidebar" style="color: var(--red-soft);" id="btn-clear-hist">Limpar Tudo</button>
       </div>
     </aside>
@@ -299,8 +304,9 @@
 
         <div class="chat-section">
           <div class="chat-tabs">
-            <button class="chat-tab active" data-tab="refinar">💬 Refinar</button>
-            <button class="chat-tab" data-tab="simular">⚔️ Simular Defesa</button>
+            <button class="chat-tab active" data-tab="refinamento">💬 Refinar</button>
+            <button class="chat-tab" data-tab="simulacao">⚔️ Simular Defesa</button>
+            <button class="chat-tab" data-tab="revisao">🔍 Revisar</button>
           </div>
           <div class="chat-history" id="chat-history"></div>
           <div class="chat-input-row">
@@ -318,22 +324,48 @@
   let tipoSelecionado = '';
   let textoAtivo = '';
   let dadosAtivos = {};
+  let chatHistorico = [];
+  let chatModo = 'refinamento';
   const $ = id => document.getElementById(id);
 
-  /* ─── MÁSCARAS (CORRIGIDAS) ───────────────────────────────── */
+  /* ─── MÁSCARAS ───────────────────────────────────────────── */
   const aplicarMascaras = () => {
     const maskCPF = v => v.replace(/\D/g, '').slice(0, 11).replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
     const maskValor = v => {
       let val = v.replace(/\D/g, '');
       if (!val) return '';
       val = (parseInt(val) / 100).toFixed(2);
-      return val.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      return val.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     };
-
     $('campo-cpf').oninput = e => e.target.value = maskCPF(e.target.value);
     $('t-cpf').oninput = e => e.target.value = maskCPF(e.target.value);
     $('campo-valor').oninput = e => e.target.value = 'R$ ' + maskValor(e.target.value);
     $('t-valor').oninput = e => e.target.value = maskValor(e.target.value);
+  };
+
+  /* ─── TOKEN / SESSÃO ─────────────────────────────────────── */
+  const getToken = async () => {
+    const stored = localStorage.getItem('petipro_tok');
+    if (stored) {
+      try {
+        const { token, trial_until } = JSON.parse(stored);
+        if (trial_until > Date.now() + 60_000) return token;
+      } catch {}
+    }
+    const resp = await fetch('/api/session', { method: 'POST' });
+    if (!resp.ok) throw new Error('Falha ao iniciar sessão');
+    const data = await resp.json();
+    localStorage.setItem('petipro_tok', JSON.stringify(data));
+    return data.token;
+  };
+
+  /* ─── ERROR BANNER ───────────────────────────────────────── */
+  const showErro = (msg) => {
+    const b = $('error-banner');
+    b.textContent = msg;
+    b.style.display = 'block';
+    clearTimeout(b._t);
+    b._t = setTimeout(() => { b.style.display = 'none'; }, 8000);
   };
 
   /* ─── NAVEGAÇÃO ──────────────────────────────────────────── */
@@ -343,6 +375,47 @@
     $('screen-result').style.display = name === 'result' ? 'block' : 'none';
   };
 
+  /* ─── SSE STREAM READER ──────────────────────────────────── */
+  async function readStream(resp, onChunk) {
+    const reader = resp.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6);
+        if (raw === '[DONE]') return { ok: true };
+        try {
+          const obj = JSON.parse(raw);
+          if (obj.erro) return { ok: false, erro: obj.erro };
+          if (obj.t) onChunk(obj.t);
+        } catch {}
+      }
+    }
+    return { ok: true };
+  }
+
+  /* ─── CHAMADA API ────────────────────────────────────────── */
+  async function chamarAPI(payload) {
+    const token = await getToken();
+    const resp = await fetch('/api/gerar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => ({}));
+      if (resp.status === 401) localStorage.removeItem('petipro_tok');
+      throw new Error(data.erro || `Erro ${resp.status}`);
+    }
+    return resp;
+  }
+
   /* ─── SELEÇÃO DE TIPO ────────────────────────────────────── */
   $('tipos-grid').onclick = e => {
     const card = e.target.closest('.tipo-card');
@@ -350,7 +423,6 @@
     document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
     card.classList.add('selected');
     tipoSelecionado = card.dataset.tipo;
-    
     const isTrab = tipoSelecionado === 'Inicial Trabalhista';
     $('form-fields').classList.toggle('visible', !isTrab);
     $('form-trabalhista').classList.toggle('visible', isTrab);
@@ -360,21 +432,26 @@
   const dispararGeracao = async (dados) => {
     showScreen('loading');
     try {
-      const resp = await fetch('/api/gerar', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(dados)
-      });
-      const data = await resp.json();
-      textoAtivo = data.peticao || "Erro: API não conectada ou sem saldo.";
+      const resp = await chamarAPI(dados);
+      chatHistorico = [];
       dadosAtivos = { ...dados, id: Date.now() };
-      
       $('result-tipo').textContent = dados.tipo;
-      $('result-body').textContent = textoAtivo;
-      salvarNoHistorico(dadosAtivos, textoAtivo);
+      $('result-body').textContent = '▋';
+      $('chat-history').innerHTML = '';
       showScreen('result');
+
+      let text = '';
+      const { ok, erro } = await readStream(resp, chunk => {
+        text += chunk;
+        $('result-body').textContent = text + '▋';
+      });
+
+      if (!ok) { showErro(erro || 'Erro durante geração.'); showScreen('form'); return; }
+      textoAtivo = text;
+      $('result-body').textContent = text;
+      salvarNoHistorico(dadosAtivos, textoAtivo);
     } catch (e) {
-      alert("Falha técnica. Verifique sua conexão.");
+      showErro(e.message || 'Falha técnica. Verifique sua conexão.');
       showScreen('form');
     }
   };
@@ -385,7 +462,7 @@
       nome: $('campo-nome').value,
       fatos: $('campo-fatos').value,
       pedido: $('campo-pedido').value,
-      valor: $('campo-valor').value
+      valor: $('campo-valor').value,
     };
     dispararGeracao(dados);
   };
@@ -397,26 +474,108 @@
       nome: $('t-nome').value,
       fatos: $('t-fatos').value,
       pedido: peds,
-      valor: $('t-valor').value
+      valor: $('t-valor').value,
     };
     dispararGeracao(dados);
+  };
+
+  /* ─── CHAT ───────────────────────────────────────────────── */
+  const appendMsg = (role, text) => {
+    const div = document.createElement('div');
+    div.className = `chat-msg chat-msg-${role === 'user' ? 'user' : 'ai'}`;
+    div.textContent = text;
+    $('chat-history').appendChild(div);
+    $('chat-history').scrollTop = $('chat-history').scrollHeight;
+    return div;
+  };
+
+  document.querySelector('.chat-tabs').onclick = e => {
+    const tab = e.target.closest('.chat-tab');
+    if (!tab) return;
+    document.querySelectorAll('.chat-tab').forEach(t => t.classList.toggle('active', t === tab));
+    chatModo = tab.dataset.tab;
+    chatHistorico = [];
+    $('chat-history').innerHTML = '';
+    const isRevisar = chatModo === 'revisao';
+    $('chat-input').placeholder = isRevisar
+      ? 'Clique em Revisar para analisar a petição...'
+      : (chatModo === 'simulacao' ? 'Faça uma pergunta à defesa...' : 'Peça uma alteração...');
+    $('btn-chat-send').textContent = isRevisar ? 'Revisar' : 'Enviar';
+  };
+
+  $('btn-chat-send').onclick = async () => {
+    const instrucao = $('chat-input').value.trim();
+    const isRevisar = chatModo === 'revisao';
+    if (!instrucao && !isRevisar) return;
+
+    $('chat-input').value = '';
+    $('btn-chat-send').disabled = true;
+    if (instrucao) appendMsg('user', instrucao);
+    const aiMsg = appendMsg('assistant', '▋');
+
+    try {
+      let payload;
+      if (isRevisar) {
+        payload = { modo: 'revisao', peticaoAtual: textoAtivo };
+      } else if (chatModo === 'simulacao') {
+        payload = { modo: 'simulacao', peticaoAtual: textoAtivo, instrucao: instrucao || '', historico: chatHistorico };
+      } else {
+        payload = { modo: 'refinamento', peticaoAtual: textoAtivo, instrucao, historico: chatHistorico };
+      }
+
+      const resp = await chamarAPI(payload);
+      let reply = '';
+      const { ok, erro } = await readStream(resp, chunk => {
+        reply += chunk;
+        aiMsg.textContent = reply + '▋';
+      });
+
+      if (!ok) {
+        aiMsg.textContent = `Erro: ${erro}`;
+      } else {
+        aiMsg.textContent = reply;
+        if (!isRevisar) {
+          chatHistorico.push({ role: 'user', content: instrucao });
+          chatHistorico.push({ role: 'assistant', content: reply });
+        }
+        if (chatModo === 'refinamento') {
+          const antesM = reply.match(/ANTES:\s*"([\s\S]*?)"\s*\n\nDEPOIS:/);
+          const depoisM = reply.match(/DEPOIS:\s*"([\s\S]*?)"\s*$/);
+          if (antesM && depoisM && textoAtivo.includes(antesM[1])) {
+            textoAtivo = textoAtivo.replace(antesM[1], depoisM[1]);
+            $('result-body').textContent = textoAtivo;
+            let hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+            if (hist.length > 0) { hist[0].texto = textoAtivo; localStorage.setItem('petipro_h', JSON.stringify(hist)); }
+          }
+        }
+      }
+    } catch (e) {
+      aiMsg.textContent = `Erro: ${e.message}`;
+    }
+    $('btn-chat-send').disabled = false;
   };
 
   /* ─── BIBLIOTECA ─────────────────────────────────────────── */
   const salvarNoHistorico = (dados, texto) => {
     let hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
     hist.unshift({ dados, texto });
+    if (hist.length > 50) hist = hist.slice(0, 50);
     localStorage.setItem('petipro_h', JSON.stringify(hist));
     renderizarBiblioteca();
   };
 
   const renderizarBiblioteca = () => {
     const hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    const q = $('sidebar-search').value.toLowerCase();
+    const filtrado = q
+      ? hist.filter(h => (h.dados.tipo || '').toLowerCase().includes(q) || (h.dados.nome || '').toLowerCase().includes(q))
+      : hist;
     $('sidebar-counter').textContent = hist.length;
-    $('sidebar-list').innerHTML = hist.map((item, idx) => `
+    $('sidebar-list').innerHTML = filtrado.map((item, idx) => `
       <div class="sidebar-item" onclick="carregarHistorico(${idx})">
-        <div class="sidebar-item-type">${item.dados.tipo}</div>
-        <div class="sidebar-item-name">${item.dados.nome}</div>
+        <div class="sidebar-item-type">${item.dados.tipo || 'Petição'}</div>
+        <div class="sidebar-item-name">${item.dados.nome || ''}</div>
+        <button class="btn-item-delete" onclick="event.stopPropagation();deletarHistorico(${idx})">✕</button>
       </div>
     `).join('');
   };
@@ -424,13 +583,83 @@
   window.carregarHistorico = idx => {
     const hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
     const item = hist[idx];
+    if (!item) return;
     textoAtivo = item.texto;
-    $('result-tipo').textContent = item.dados.tipo;
+    dadosAtivos = item.dados;
+    chatHistorico = [];
+    $('result-tipo').textContent = item.dados.tipo || 'Petição';
     $('result-body').textContent = textoAtivo;
+    $('chat-history').innerHTML = '';
     showScreen('result');
   };
 
-  /* ─── UI BÁSICA ───────────────────────────────────────────── */
+  window.deletarHistorico = idx => {
+    let hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    hist.splice(idx, 1);
+    localStorage.setItem('petipro_h', JSON.stringify(hist));
+    renderizarBiblioteca();
+  };
+
+  /* ─── PDF ────────────────────────────────────────────────── */
+  const exportarPDF = (titulo, texto) => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const margin = 25;
+    const maxW = doc.internal.pageSize.getWidth() - margin * 2;
+    doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+    doc.text(titulo, margin, margin);
+    doc.setFontSize(11); doc.setFont('helvetica', 'normal');
+    const lines = doc.splitTextToSize(texto, maxW);
+    let y = margin + 10;
+    const pageH = doc.internal.pageSize.getHeight() - margin;
+    for (const line of lines) {
+      if (y + 6 > pageH) { doc.addPage(); y = margin; }
+      doc.text(line, margin, y); y += 6;
+    }
+    doc.save(`${titulo.replace(/[^a-z0-9]/gi, '_')}.pdf`);
+  };
+
+  $('btn-pdf').onclick = () => { if (textoAtivo) exportarPDF(dadosAtivos.tipo || 'Petição', textoAtivo); };
+
+  $('btn-export-pdf').onclick = () => {
+    const hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    if (!hist.length) { showErro('Biblioteca vazia.'); return; }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const margin = 25;
+    const maxW = doc.internal.pageSize.getWidth() - margin * 2;
+    const pageH = doc.internal.pageSize.getHeight() - margin;
+    hist.forEach((item, i) => {
+      if (i > 0) doc.addPage();
+      let y = margin;
+      doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+      doc.text(item.dados.tipo || 'Petição', margin, y); y += 8;
+      doc.setFontSize(11); doc.setFont('helvetica', 'normal');
+      for (const line of doc.splitTextToSize(item.texto, maxW)) {
+        if (y + 6 > pageH) { doc.addPage(); y = margin; }
+        doc.text(line, margin, y); y += 6;
+      }
+    });
+    doc.save('biblioteca_peti_pro.pdf');
+  };
+
+  /* ─── EXCEL ──────────────────────────────────────────────── */
+  $('btn-export-excel').onclick = () => {
+    const hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+    if (!hist.length) { showErro('Biblioteca vazia.'); return; }
+    const rows = hist.map(item => ({
+      Tipo: item.dados.tipo || '',
+      Cliente: item.dados.nome || '',
+      Data: item.dados.id ? new Date(item.dados.id).toLocaleDateString('pt-BR') : '',
+      'Petição': item.texto || '',
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Petições');
+    XLSX.writeFile(wb, 'biblioteca_peti_pro.xlsx');
+  };
+
+  /* ─── UI BÁSICA ──────────────────────────────────────────── */
   $('btn-hamburger').onclick = () => {
     $('sidebar').classList.toggle('open');
     $('sidebar-overlay').classList.toggle('open');
@@ -450,13 +679,19 @@
     $('btn-copiar').textContent = 'Copiado!';
     setTimeout(() => $('btn-copiar').textContent = 'Copiar Texto', 2000);
   };
-  $('btn-nova').onclick = () => {
-    showScreen('form');
+  $('btn-nova').onclick = () => showScreen('form');
+  $('btn-clear-hist').onclick = () => {
+    if (confirm('Apagar toda a biblioteca?')) {
+      localStorage.removeItem('petipro_h');
+      renderizarBiblioteca();
+    }
   };
+  $('sidebar-search').oninput = renderizarBiblioteca;
 
-  // Init
+  /* ─── INIT ───────────────────────────────────────────────── */
   aplicarMascaras();
   renderizarBiblioteca();
+  getToken().catch(() => {});
 </script>
 </body>
 </html>

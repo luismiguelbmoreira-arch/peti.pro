@@ -4,7 +4,7 @@
   "regions": ["gru1"],
   "cleanUrls": true,
   "functions": {
-    "api/gerar.js": { "maxDuration": 30 },
+    "api/gerar.js": { "maxDuration": 60 },
     "api/session.js": { "maxDuration": 5 }
   },
   "headers": [

@@ -35,9 +35,10 @@ function makeReq(native, body) {
 
 function makeRes(native) {
   let statusCode = 200;
-  const res = Object.assign(native, {
+  const res = {
     status(code) { statusCode = code; native.statusCode = code; return res; },
     setHeader(k, v) { native.setHeader(k, v); return res; },
+    getHeader(k) { return native.getHeader(k); },
     json(obj) {
       native.statusCode = statusCode;
       if (!native.getHeader('Content-Type')) native.setHeader('Content-Type', 'application/json');
@@ -45,9 +46,7 @@ function makeRes(native) {
     },
     write(chunk) { return native.write(chunk); },
     end(data) { return native.end(data); },
-    writableEnded: false,
-    getHeader(k) { return native.getHeader(k); },
-  });
+  };
   return res;
 }
 

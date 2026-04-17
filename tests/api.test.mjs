@@ -129,7 +129,15 @@ test('rate-limit: bloqueia após exceder limite hora', () => {
 // ── Handler /api/gerar ────────────────────────────────────────────────────────
 
 const mockClient = {
-  messages: { create: async () => ({ content: [{ text: 'Petição gerada com sucesso.' }] }) },
+  messages: {
+    create: async () => {
+      async function* stream() {
+        yield { type: 'content_block_delta', delta: { type: 'text_delta', text: 'Petição ' } };
+        yield { type: 'content_block_delta', delta: { type: 'text_delta', text: 'gerada com sucesso.' } };
+      }
+      return stream();
+    },
+  },
 };
 
 function makeReq(method, body, headers = {}) {
@@ -148,13 +156,18 @@ function makeReq(method, body, headers = {}) {
 function makeRes() {
   let _status = 200;
   let _body = null;
+  const _chunks = [];
+  const _headers = {};
   const res = {
     _getStatus: () => _status,
     _getBody: () => _body,
+    _getChunks: () => _chunks,
     status(code) { _status = code; return res; },
-    setHeader() { return res; },
+    setHeader(k, v) { _headers[k.toLowerCase()] = v; return res; },
+    getHeader(k) { return _headers[k.toLowerCase()]; },
     end() { return res; },
     json(data) { _body = data; return res; },
+    write(chunk) { _chunks.push(chunk); return res; },
   };
   return res;
 }
@@ -205,12 +218,15 @@ test('handler: fatos muito grandes retorna 400', async () => {
   assert.equal(res._getStatus(), 400);
 });
 
-test('handler: payload válido retorna 200 com petição', async () => {
+test('handler: payload válido retorna 200 com SSE streaming', async () => {
   const res = makeRes();
   await handler(makeReq('POST',
     { tipo: 'Indenização', nome: 'João da Silva', fatos: 'O réu causou danos. '.repeat(5), pedido: 'Indenização por danos.' },
     { authorization: `Bearer ${validToken()}` },
   ), res);
   assert.equal(res._getStatus(), 200);
-  assert.ok(res._getBody()?.peticao);
+  const out = res._getChunks().join('');
+  assert.ok(out.includes('[DONE]'), 'stream deve terminar com [DONE]');
+  assert.ok(out.includes('"t":'), 'stream deve conter chunks de texto');
+  assert.ok(out.includes('Petição'), 'deve conter texto da petição');
 });

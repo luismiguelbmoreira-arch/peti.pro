@@ -169,6 +169,9 @@
     .auth-box .btn-primary { width: 100%; padding: 13px; font-size: 15px; }
     .auth-msg { font-size: 13px; color: var(--text-sec); margin-top: 14px; min-height: 20px; line-height: 1.5; }
     .auth-msg.error { color: #c0392b; }
+    .auth-toggle { font-size: 13px; color: var(--text-sec); margin-top: 16px; }
+    .auth-toggle a { color: var(--amber); text-decoration: none; font-weight: 600; }
+    .auth-toggle a:hover { text-decoration: underline; }
 
     /* ─── USAGE BANNER ──────────────────────────────────────────── */
     .usage-banner { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: var(--radius); font-size: 12px; font-weight: 500; margin-bottom: 16px; border: 1px solid transparent; }
@@ -253,11 +256,12 @@
 <div class="auth-overlay" id="auth-overlay">
   <div class="auth-box">
     <p class="auth-logo">Peti.PRO</p>
-    <h2>Acesse o Peti.PRO</h2>
-    <p class="auth-sub">Novo ou já cliente — é só o e-mail. Enviamos um link de acesso.</p>
+    <h2 id="auth-title">Entrar</h2>
+    <p class="auth-sub" id="auth-sub">Acesse sua conta com link por e-mail.</p>
     <input type="email" id="auth-email" placeholder="seu@email.com" autocomplete="email" />
-    <button class="btn-primary" id="auth-btn">Continuar →</button>
+    <button class="btn-primary" id="auth-btn">Entrar →</button>
     <p class="auth-msg" id="auth-msg"></p>
+    <p class="auth-toggle">Não tem conta? <a href="#" id="auth-switch">Criar grátis</a></p>
   </div>
 </div>
 
@@ -802,6 +806,28 @@
   const showAuthModal = () => $('auth-overlay').classList.remove('hidden');
   const hideAuthModal = () => $('auth-overlay').classList.add('hidden');
 
+  let authMode = 'login'; // 'login' | 'signup'
+
+  $('auth-switch').onclick = (e) => {
+    e.preventDefault();
+    authMode = authMode === 'login' ? 'signup' : 'login';
+    if (authMode === 'signup') {
+      $('auth-title').textContent = 'Criar conta grátis';
+      $('auth-sub').textContent = '7 dias gratuitos. Sem cartão agora.';
+      $('auth-btn').textContent = 'Criar conta →';
+      $('auth-switch').textContent = 'Fazer login';
+      $('auth-switch').previousSibling.textContent = 'Já tem conta? ';
+    } else {
+      $('auth-title').textContent = 'Entrar';
+      $('auth-sub').textContent = 'Acesse sua conta com link por e-mail.';
+      $('auth-btn').textContent = 'Entrar →';
+      $('auth-switch').textContent = 'Criar grátis';
+      $('auth-switch').previousSibling.textContent = 'Não tem conta? ';
+    }
+    $('auth-msg').textContent = '';
+    $('auth-msg').className = 'auth-msg';
+  };
+
   $('auth-btn').onclick = async () => {
     const email = $('auth-email').value.trim();
     const msg = $('auth-msg');
@@ -818,13 +844,13 @@
       const sb = await initSupabase();
       const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
       if (error) throw error;
-      msg.textContent = 'Link enviado. Verifique seu email e clique no link para entrar.';
+      msg.textContent = 'Link enviado! Verifique seu email e clique no link para entrar.';
       $('auth-btn').textContent = 'Email enviado ✓';
     } catch (e) {
       msg.textContent = e.message || 'Erro ao enviar email.';
       msg.className = 'auth-msg error';
       $('auth-btn').disabled = false;
-      $('auth-btn').textContent = 'Entrar →';
+      $('auth-btn').textContent = authMode === 'signup' ? 'Criar conta →' : 'Entrar →';
     }
   };
 

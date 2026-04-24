@@ -47,25 +47,63 @@ const geracaoSchema = z.object({
   pedido: z.string().min(5, 'Pedido muito curto').max(5000),
   audienciaConciliacao: z.enum(['sim', 'nao', '']).optional().default(''),
   valor: z.string().max(50).optional().default(''),
+
+  // Docs adicionais do cliente
+  rg: z.string().max(20).optional().default(''),
+  ctps: z.string().max(30).optional().default(''),
+  pis: z.string().max(20).optional().default(''),
+  nacionalidade: z.string().max(60).optional().default(''),
+
+  // Trabalhista — vínculo empregatício
+  dataAdmissao: z.string().max(20).optional().default(''),
+  dataDemissao: z.string().max(20).optional().default(''),
+  cargo: z.string().max(100).optional().default(''),
+  salario: z.string().max(50).optional().default(''),
+  jornada: z.string().max(100).optional().default(''),
+  tipoDesligamento: z.string().max(100).optional().default(''),
+
+  // Habeas Corpus
+  pacienteDoc: z.string().max(50).optional().default(''),
+  localRecolhimento: z.string().max(300).optional().default(''),
+  numProcesso: z.string().max(50).optional().default(''),
+  autoridadeCargo: z.string().max(200).optional().default(''),
+  tipoConstrangimento: z.string().max(100).optional().default(''),
+  tribunal: z.string().max(200).optional().default(''),
+
+  // Contestação Cível
+  preliminares: z.string().max(500).optional().default(''),
+
+  // Indenização
+  tipoDano: z.string().max(200).optional().default(''),
+  valorDanoMaterial: z.string().max(50).optional().default(''),
+  valorDanoMoral: z.string().max(50).optional().default(''),
+  provasDocumentos: z.string().max(1000).optional().default(''),
 });
 
 const refinamentoSchema = z.object({
   modo: z.literal('refinamento'),
-  peticaoAtual: z.string().min(1).max(20000),
-  instrucao: z.string().min(1, 'Instrução obrigatória').max(1000),
+  peticaoAtual: z.string().min(1).max(50000),
+  instrucao: z.string().min(1, 'Instrução obrigatória').max(10000),
   historico: historicoSchema,
 });
 
 const simulacaoSchema = z.object({
   modo: z.literal('simulacao'),
-  peticaoAtual: z.string().min(1).max(20000),
-  instrucao: z.string().max(1000).optional().default(''),
+  peticaoAtual: z.string().min(1).max(50000),
+  instrucao: z.string().max(10000).optional().default(''),
   historico: historicoSchema,
 });
 
 const revisaoSchema = z.object({
   modo: z.literal('revisao'),
-  peticaoAtual: z.string().min(1).max(20000),
+  peticaoAtual: z.string().min(1).max(50000),
+});
+
+const diaboSchema = z.object({
+  modo: z.literal('diabo'),
+  peticaoAtual: z.string().min(1).max(50000),
+  instrucao: z.string().max(10000).optional().default(''),
+  historico: historicoSchema,
 });
 
 export function validatePayload(body) {
@@ -74,6 +112,7 @@ export function validatePayload(body) {
     case 'refinamento': return refinamentoSchema.safeParse(body);
     case 'simulacao':   return simulacaoSchema.safeParse(body);
     case 'revisao':     return revisaoSchema.safeParse(body);
+    case 'diabo':       return diaboSchema.safeParse(body);
     default:            return geracaoSchema.safeParse(body);
   }
 }

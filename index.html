@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
   <style>
     /* ─── RESET & BASE ─────────────────────────────────────────── */
@@ -117,8 +118,8 @@
     .tipo-card:hover, .tipo-card.selected { border-color: var(--amber); background: var(--amber-pale); }
     .tipo-card.selected { border-width: 2px; }
 
-    .form-fields, #form-trabalhista { display: none; }
-    .form-fields.visible, #form-trabalhista.visible { display: block; animation: fadeIn 0.3s ease forwards; }
+    .petition-form { display: none; }
+    .petition-form.visible { display: block; animation: fadeIn 0.3s ease forwards; }
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -153,12 +154,79 @@
     .chat-msg { padding: 10px 15px; border-radius: 8px; font-size: 13px; max-width: 85%; }
     .chat-msg-user { align-self: flex-end; background: var(--amber-pale); border: 1px solid var(--amber); }
     .chat-msg-ai { align-self: flex-start; background: #fff; border: 1px solid #ddd; }
+    .btn-usar-correcao { align-self: flex-start; margin-top: 4px; background: none; color: var(--amber); border: 1.5px solid var(--amber); border-radius: var(--radius); padding: 6px 14px; font-size: 12px; cursor: pointer; }
+    .btn-usar-correcao:hover { background: var(--amber-pale); }
+
+    /* ─── AUTH MODAL ────────────────────────────────────────────── */
+    .auth-overlay { position: fixed; inset: 0; background: var(--linen); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+    .auth-overlay.hidden { display: none; }
+    .auth-box { width: 100%; max-width: 360px; text-align: center; padding: 40px 24px; }
+    .auth-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--amber); margin-bottom: 28px; letter-spacing: -0.3px; }
+    .auth-box h2 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .auth-sub { color: var(--text-sec); font-size: 14px; margin-bottom: 28px; line-height: 1.5; }
+    .auth-box input[type="email"] { width: 100%; padding: 12px 14px; border: 1.5px solid #ddd; border-radius: var(--radius); font-size: 15px; font-family: inherit; margin-bottom: 10px; outline: none; background: #fff; }
+    .auth-box input[type="email"]:focus { border-color: var(--amber); }
+    .auth-box .btn-primary { width: 100%; padding: 13px; font-size: 15px; }
+    .auth-msg { font-size: 13px; color: var(--text-sec); margin-top: 14px; min-height: 20px; line-height: 1.5; }
+    .auth-msg.error { color: #c0392b; }
+
+    /* ─── USAGE BANNER ──────────────────────────────────────────── */
+    .usage-banner { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: var(--radius); font-size: 12px; font-weight: 500; margin-bottom: 16px; border: 1px solid transparent; }
+    .usage-banner.trial { background: var(--amber-pale); border-color: rgba(201,148,58,0.35); color: var(--coffee); }
+    .usage-banner.subscriber { background: #f0f7f1; border-color: rgba(61,107,69,0.3); color: #3D6B45; }
+    .usage-banner-text { flex: 1; }
+    .usage-bar-wrap { width: 60px; height: 4px; background: rgba(0,0,0,0.1); border-radius: 2px; flex-shrink: 0; }
+    .usage-bar-fill { height: 100%; border-radius: 2px; background: var(--amber); transition: width 0.4s ease; }
+    .usage-banner.subscriber .usage-bar-fill { background: #3D6B45; }
+    .usage-upgrade-link { font-size: 11px; font-weight: 600; color: var(--amber); cursor: pointer; white-space: nowrap; text-decoration: underline; text-underline-offset: 2px; }
+
+    /* ─── UPGRADE MODAL ─────────────────────────────────────────── */
+    .upgrade-overlay { position: fixed; inset: 0; background: rgba(28,28,28,0.72); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+    .upgrade-overlay.open { opacity: 1; pointer-events: auto; }
+    .upgrade-modal { background: var(--linen); border-radius: 12px; width: 100%; max-width: 720px; padding: 40px 36px; position: relative; max-height: 90vh; overflow-y: auto; transform: translateY(16px); transition: transform 0.2s ease; }
+    .upgrade-overlay.open .upgrade-modal { transform: translateY(0); }
+    .upgrade-modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: #888; }
+    .upgrade-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase; color: var(--amber); margin-bottom: 6px; }
+    .upgrade-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .upgrade-subtitle { font-size: 14px; color: var(--text-sec); margin-bottom: 32px; }
+    .plan-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .plan-card { background: #fff; border: 1.5px solid rgba(201,148,58,0.2); border-radius: 10px; padding: 24px 20px; display: flex; flex-direction: column; position: relative; transition: border-color 0.15s; }
+    .plan-card:hover { border-color: var(--amber); }
+    .plan-card.featured { border-color: var(--amber); border-width: 2px; box-shadow: 0 4px 24px rgba(201,148,58,0.15); }
+    .plan-badge { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: var(--amber); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .plan-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .plan-price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
+    .plan-price-val { font-size: 30px; font-weight: 700; color: var(--text); }
+    .plan-price-period { font-size: 13px; color: var(--text-sec); }
+    .plan-desc { font-size: 12px; color: var(--text-sec); margin-bottom: 16px; line-height: 1.5; min-height: 32px; }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; margin-bottom: 18px; }
+    .plan-features li { font-size: 13px; color: var(--text); display: flex; align-items: flex-start; gap: 8px; }
+    .plan-features li::before { content: '✓'; color: #3D6B45; font-weight: 700; flex-shrink: 0; }
+    .plan-btn { width: 100%; padding: 11px; border-radius: var(--radius); font-weight: 600; font-size: 14px; cursor: pointer; border: 1.5px solid var(--amber); background: none; color: var(--amber); font-family: inherit; transition: opacity 0.15s; }
+    .plan-card.featured .plan-btn { background: var(--amber); color: #fff; }
+    .plan-btn:hover { opacity: 0.85; }
+    .upgrade-footer { margin-top: 24px; text-align: center; font-size: 12px; color: var(--text-sec); }
+    .plan-pill { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; background: var(--amber-pale); color: var(--amber); border: 1px solid rgba(201,148,58,0.4); letter-spacing: 0.4px; cursor: pointer; }
+    .plan-pill.subscriber { background: #f0f7f1; color: #3D6B45; border-color: rgba(61,107,69,0.35); cursor: default; }
+    @media (max-width: 768px) { .plan-cards { grid-template-columns: 1fr; } .upgrade-modal { padding: 28px 20px; } }
     .chat-input-row { display: flex; gap: 10px; }
     .chat-input { flex: 1; padding: 10px; border-radius: var(--radius); border: 1px solid #ddd; resize: none; }
 
-    /* ─── TRABALHISTA ESPECÍFICO ────────────────────────────── */
+    /* ─── FORMULÁRIOS POR TIPO ──────────────────────────────── */
+    .petition-form { display: none; }
+    .petition-form.visible { display: block; animation: fadeIn 0.3s ease forwards; }
+    .form-section { margin-bottom: 28px; }
+    .form-section-title {
+      font-size: 10px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase;
+      color: var(--amber); margin-bottom: 12px; padding-bottom: 8px;
+      border-bottom: 1px solid rgba(201,148,58,0.2);
+    }
+    .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px 28px; }
+    .checkbox-item { display: flex; align-items: center; gap: 7px; font-size: 13px; cursor: pointer; }
+    .checkbox-item input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--amber); cursor: pointer; flex-shrink: 0; }
     .pedido-item { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
-    .btn-pedido-action { background: var(--amber-pale); border: 1px solid var(--amber); color: var(--amber); width: 30px; height: 30px; cursor: pointer; border-radius: 4px; }
+    .btn-pedido-action { background: var(--amber-pale); border: 1px solid var(--amber); color: var(--amber); padding: 6px 12px; cursor: pointer; border-radius: 4px; font-size: 12px; margin-top: 6px; }
     
     /* ─── LOADING ─────────────────────────────────────────── */
     #screen-loading { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; }
@@ -181,11 +249,58 @@
 </head>
 <body>
 
+<!-- ─── AUTH MODAL ─────────────────────────────────────────── -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <p class="auth-logo">Peti.PRO</p>
+    <h2>Comece grátis</h2>
+    <p class="auth-sub">7 dias gratuitos. Sem cartão agora.</p>
+    <input type="email" id="auth-email" placeholder="seu@email.com" autocomplete="email" />
+    <button class="btn-primary" id="auth-btn">Entrar →</button>
+    <p class="auth-msg" id="auth-msg"></p>
+  </div>
+</div>
+
+<!-- ─── UPGRADE MODAL ──────────────────────────────────────── -->
+<div class="upgrade-overlay" id="upgrade-overlay">
+  <div class="upgrade-modal">
+    <button class="upgrade-modal-close" id="upgrade-close">✕</button>
+    <p class="upgrade-eyebrow">Peti.PRO</p>
+    <h2 class="upgrade-title">Escolha seu plano</h2>
+    <p class="upgrade-subtitle" id="upgrade-subtitle">Continue gerando petições sem interrupção.</p>
+    <div class="plan-cards">
+      <div class="plan-card">
+        <p class="plan-name">Básico</p>
+        <div class="plan-price"><span class="plan-price-val">R$&nbsp;49</span><span class="plan-price-period">/mês</span></div>
+        <p class="plan-desc">Para advogados que usam pontualmente.</p>
+        <ul class="plan-features"><li>30 petições por mês</li><li>Todos os tipos de peças</li><li>Refinar, revisar, simular defesa</li><li>Export PDF e Excel</li></ul>
+        <button class="plan-btn" data-plan="basico">Assinar Básico</button>
+      </div>
+      <div class="plan-card featured">
+        <span class="plan-badge">Mais popular</span>
+        <p class="plan-name">Pro</p>
+        <div class="plan-price"><span class="plan-price-val">R$&nbsp;129</span><span class="plan-price-period">/mês</span></div>
+        <p class="plan-desc">Para quem usa diariamente no escritório.</p>
+        <ul class="plan-features"><li>100 petições por mês</li><li>Todos os tipos de peças</li><li>Todos os modos de chat</li><li>Suporte prioritário</li></ul>
+        <button class="plan-btn" data-plan="pro">Assinar Pro</button>
+      </div>
+      <div class="plan-card">
+        <p class="plan-name">Escritório</p>
+        <div class="plan-price"><span class="plan-price-val">R$&nbsp;349</span><span class="plan-price-period">/mês</span></div>
+        <p class="plan-desc">Para equipes com alto volume de peças.</p>
+        <ul class="plan-features"><li>Petições ilimitadas</li><li>Todos os tipos de peças</li><li>Todos os modos de chat</li><li>Suporte via WhatsApp</li></ul>
+        <button class="plan-btn" data-plan="escritorio">Assinar Escritório</button>
+      </div>
+    </div>
+    <p class="upgrade-footer">Pagamento seguro via Stripe &middot; Cancele quando quiser</p>
+  </div>
+</div>
+
 <div class="app">
   <header class="header">
     <button class="hamburger" id="btn-hamburger"><span></span><span></span><span></span></button>
     <div class="logo">Peti.PRO</div>
-    <button class="btn-primary" style="padding: 8px 16px; font-size: 13px;">7 dias grátis</button>
+    <button class="plan-pill" id="header-plan-btn" style="display:none;"></button>
   </header>
 
   <div id="error-banner" style="display:none;background:#c0392b;color:#fff;padding:12px 32px;font-size:13px;font-weight:500;"></div>
@@ -221,66 +336,273 @@
           <div class="tipo-card" data-tipo="Indenização">💼 <b>Indenização</b></div>
         </div>
 
-        <!-- FORM PADRÃO -->
-        <div class="form-fields" id="form-fields">
-          <div class="form-row">
-            <div class="field-wrap">
-              <label>Nome do Cliente *</label>
-              <input type="text" id="campo-nome" />
-              <span class="field-error" id="erro-nome">Obrigatório</span>
+        <!-- ══ FORM TRABALHISTA ══════════════════════════════ -->
+        <div class="petition-form" id="form-trabalhista">
+          <div class="form-section">
+            <div class="form-section-title">Reclamante</div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Nome Completo *</label><input type="text" id="t-nome" /></div>
+              <div class="field-wrap"><label>CPF *</label><input type="text" id="t-cpf" maxlength="14" placeholder="000.000.000-00" /></div>
             </div>
-            <div class="field-wrap">
-              <label>CPF</label>
-              <input type="text" id="campo-cpf" placeholder="000.000.000-00" />
+            <div class="form-row triple">
+              <div class="field-wrap"><label>RG</label><input type="text" id="t-rg" /></div>
+              <div class="field-wrap"><label>CTPS (nº / série)</label><input type="text" id="t-ctps" placeholder="000000 / 001" /></div>
+              <div class="field-wrap"><label>PIS / PASEP</label><input type="text" id="t-pis" /></div>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Estado Civil</label>
+                <select id="t-estado-civil"><option value="">Selecione</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option><option>União estável</option></select>
+              </div>
+              <div class="field-wrap"><label>Nacionalidade</label><input type="text" id="t-nacionalidade" placeholder="Brasileiro(a)" /></div>
+            </div>
+            <div class="form-row single"><div class="field-wrap"><label>Endereço Completo</label><input type="text" id="t-endereco" placeholder="Rua, nº, bairro, cidade – UF, CEP" /></div></div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Reclamado (Empregador)</div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Nome / Razão Social *</label><input type="text" id="t-reclamado" /></div>
+              <div class="field-wrap"><label>Tipo</label>
+                <select id="t-tipo-parte"><option value="pj">Pessoa Jurídica</option><option value="pf">Pessoa Física</option></select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap"><label>CNPJ / CPF</label><input type="text" id="t-contra-doc" maxlength="18" /></div>
+              <div class="field-wrap"><label>Endereço do Estabelecimento</label><input type="text" id="t-contra-endereco" /></div>
             </div>
           </div>
-          <div class="form-row single">
-            <div class="field-wrap">
-              <label>Fatos *</label>
-              <textarea id="campo-fatos" rows="5"></textarea>
+
+          <div class="form-section">
+            <div class="form-section-title">Vínculo Empregatício</div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Data de Admissão *</label><input type="date" id="t-admissao" /></div>
+              <div class="field-wrap"><label>Data de Demissão</label><input type="date" id="t-demissao" /></div>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Cargo / Função *</label><input type="text" id="t-cargo" /></div>
+              <div class="field-wrap"><label>Último Salário (R$) *</label><input type="text" id="t-salario" placeholder="0,00" /></div>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Jornada de Trabalho</label>
+                <select id="t-jornada">
+                  <option value="">Selecione</option>
+                  <option>44h semanais (8h/dia + Sáb 4h)</option>
+                  <option>44h semanais (8h48/dia, Seg–Sex)</option>
+                  <option>36h semanais</option><option>30h semanais</option>
+                  <option>Escala 12x36</option>
+                  <option>Turno ininterrupto de revezamento</option>
+                  <option>Jornada irregular / não registrada</option>
+                </select>
+              </div>
+              <div class="field-wrap"><label>Tipo de Desligamento *</label>
+                <select id="t-desligamento">
+                  <option value="">Selecione</option>
+                  <option>Dispensa sem justa causa</option>
+                  <option>Dispensa com justa causa</option>
+                  <option>Pedido de demissão</option>
+                  <option>Rescisão indireta</option>
+                  <option>Acordo (art. 484-A CLT)</option>
+                  <option>Término de contrato por prazo determinado</option>
+                  <option>Vínculo ainda vigente</option>
+                </select>
+              </div>
             </div>
           </div>
-          <div class="form-row">
-            <div class="field-wrap">
-              <label>Pedido Principal *</label>
-              <input type="text" id="campo-pedido" />
-            </div>
-            <div class="field-wrap">
-              <label>Valor da Causa</label>
-              <input type="text" id="campo-valor" placeholder="R$ 0,00" />
+
+          <div class="form-section">
+            <div class="form-section-title">Processo</div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Vara do Trabalho / TRT</label><input type="text" id="t-vara" placeholder="Ex: 3ª Vara do Trabalho de São Paulo" /></div>
+              <div class="field-wrap"><label>Audiência de Conciliação</label>
+                <select id="t-audiencia"><option value="">Selecione</option><option value="sim">Requer audiência</option><option value="nao">Dispensa audiência</option></select>
+              </div>
             </div>
           </div>
-          <button class="btn-primary" id="btn-gerar">Gerar Petição →</button>
+
+          <div class="form-section">
+            <div class="form-section-title">Fatos e Pedidos</div>
+            <div class="form-row single"><div class="field-wrap"><label>Fatos *</label><textarea id="t-fatos" rows="5" placeholder="Descreva os fatos que originaram a reclamação..."></textarea></div></div>
+            <div class="field-wrap" style="margin-bottom:16px;">
+              <label>Pedidos (um por campo)</label>
+              <div id="t-pedidos-list">
+                <div class="pedido-item"><input type="text" placeholder="Ex: Verbas rescisórias (saldo, aviso, férias+1/3)" /></div>
+                <div class="pedido-item"><input type="text" placeholder="Ex: FGTS + multa de 40%" /></div>
+                <div class="pedido-item"><input type="text" placeholder="Ex: Horas extras + reflexos" /></div>
+              </div>
+              <button class="btn-pedido-action" id="btn-add-pedido" type="button">+ Pedido</button>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Valor Estimado da Causa (R$)</label><input type="text" id="t-valor" placeholder="0,00" /></div>
+            </div>
+          </div>
+          <button class="btn-primary petition-submit" style="margin-top:4px;">Gerar Reclamação Trabalhista →</button>
         </div>
 
-        <!-- FORM TRABALHISTA -->
-        <div id="form-trabalhista">
-           <div class="form-row">
-              <div class="field-wrap">
-                <label>Nome do Reclamante *</label>
-                <input type="text" id="t-nome" />
+        <!-- ══ FORM HABEAS CORPUS ═════════════════════════════ -->
+        <div class="petition-form" id="form-habeas">
+          <div class="form-section">
+            <div class="form-section-title">Paciente (Preso / Ameaçado)</div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Nome Completo *</label><input type="text" id="hc-nome" /></div>
+              <div class="field-wrap"><label>CPF / RG *</label><input type="text" id="hc-cpf" /></div>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Local de Recolhimento *</label><input type="text" id="hc-local" placeholder="Ex: Cadeia Pública de Campinas" /></div>
+              <div class="field-wrap"><label>Nº do Processo / Inquérito</label><input type="text" id="hc-processo" /></div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Autoridade Coatora</div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Nome / Identificação *</label><input type="text" id="hc-autoridade" placeholder="Ex: Dr. João Silva" /></div>
+              <div class="field-wrap"><label>Cargo / Vara / Delegacia *</label><input type="text" id="hc-cargo" placeholder="Ex: Juiz — 2ª Vara Criminal de SP" /></div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Constrangimento e Tribunal</div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Tipo de Constrangimento *</label>
+                <select id="hc-tipo">
+                  <option value="">Selecione</option>
+                  <option>Prisão em flagrante ilegal</option>
+                  <option>Prisão preventiva ilegal</option>
+                  <option>Prisão temporária ilegal</option>
+                  <option>Excesso de prazo na formação da culpa</option>
+                  <option>Falta de fundamentação do decreto prisional</option>
+                  <option>Prisão por dívida (vedada pela CF)</option>
+                  <option>Ameaça à liberdade de locomoção</option>
+                </select>
               </div>
-              <div class="field-wrap">
-                <label>CPF *</label>
-                <input type="text" id="t-cpf" maxlength="14" />
+              <div class="field-wrap"><label>Tribunal Competente</label><input type="text" id="hc-tribunal" placeholder="Ex: TJSP, STJ, STF..." /></div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Fatos e Pedido</div>
+            <div class="form-row single"><div class="field-wrap"><label>Fatos — descrição do constrangimento ilegal *</label><textarea id="hc-fatos" rows="5" placeholder="Descreva a prisão, o ato ilegal e por que é ilegal..."></textarea></div></div>
+            <div class="form-row single"><div class="field-wrap"><label>Pedido *</label><textarea id="hc-pedido" rows="3" placeholder="Ex: Concessão de liminar para soltura imediata e, no mérito, concessão definitiva do Habeas Corpus..."></textarea></div></div>
+          </div>
+          <button class="btn-primary petition-submit">Gerar Habeas Corpus →</button>
+        </div>
+
+        <!-- ══ FORM CONTESTAÇÃO CÍVEL ════════════════════════ -->
+        <div class="petition-form" id="form-contestacao">
+          <div class="form-section">
+            <div class="form-section-title">Identificação do Processo</div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Nº do Processo *</label><input type="text" id="cont-processo" placeholder="0000000-00.0000.0.00.0000" /></div>
+              <div class="field-wrap"><label>Vara / Comarca *</label><input type="text" id="cont-vara" placeholder="Ex: 2ª Vara Cível de Campinas" /></div>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Nome do Autor (referência) *</label><input type="text" id="cont-autor" /></div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Réu (Contestante)</div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Nome / Razão Social *</label><input type="text" id="cont-nome" /></div>
+              <div class="field-wrap"><label>CPF / CNPJ *</label><input type="text" id="cont-doc" maxlength="18" /></div>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Estado Civil</label>
+                <select id="cont-estado-civil"><option value="">Selecione</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option><option>União estável</option></select>
               </div>
-           </div>
-           <div class="field-wrap" style="margin-bottom: 16px;">
-              <label>Fatos do Trabalho *</label>
-              <textarea id="t-fatos" rows="4"></textarea>
-           </div>
-           <div class="field-wrap">
-              <label>Pedidos (um por linha)</label>
-              <div id="t-pedidos-list">
-                <div class="pedido-item"><input type="text" placeholder="Ex: Verbas Rescisórias" /></div>
+              <div class="field-wrap"><label>Profissão</label><input type="text" id="cont-profissao" /></div>
+            </div>
+            <div class="form-row single"><div class="field-wrap"><label>Endereço Completo</label><input type="text" id="cont-endereco" placeholder="Rua, nº, bairro, cidade – UF" /></div></div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Preliminares — art. 337 CPC (marque as que se aplicam)</div>
+            <div class="checkbox-group" id="cont-prelims">
+              <label class="checkbox-item"><input type="checkbox" value="Incompetência absoluta do juízo"> Incompetência absoluta</label>
+              <label class="checkbox-item"><input type="checkbox" value="Incompetência relativa do juízo"> Incompetência relativa</label>
+              <label class="checkbox-item"><input type="checkbox" value="Inépcia da petição inicial"> Inépcia da inicial</label>
+              <label class="checkbox-item"><input type="checkbox" value="Ilegitimidade de parte"> Ilegitimidade de parte</label>
+              <label class="checkbox-item"><input type="checkbox" value="Falta de interesse processual"> Falta de interesse processual</label>
+              <label class="checkbox-item"><input type="checkbox" value="Prescrição"> Prescrição</label>
+              <label class="checkbox-item"><input type="checkbox" value="Decadência"> Decadência</label>
+              <label class="checkbox-item"><input type="checkbox" value="Litispendência"> Litispendência</label>
+              <label class="checkbox-item"><input type="checkbox" value="Coisa julgada"> Coisa julgada</label>
+              <label class="checkbox-item"><input type="checkbox" value="Conexão ou continência"> Conexão / continência</label>
+              <label class="checkbox-item"><input type="checkbox" value="Incorreção do valor da causa"> Incorreção do valor da causa</label>
+              <label class="checkbox-item"><input type="checkbox" value="Perempção"> Perempção</label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Mérito e Pedido</div>
+            <div class="form-row single"><div class="field-wrap"><label>Fatos — versão da defesa *</label><textarea id="cont-fatos" rows="5" placeholder="Descreva os fatos sob a perspectiva do réu..."></textarea></div></div>
+            <div class="form-row single"><div class="field-wrap"><label>Fundamentos Jurídicos Adicionais</label><textarea id="cont-fundamentos" rows="3" placeholder="Artigos, súmulas, jurisprudência relevante..."></textarea></div></div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Pedido *</label><input type="text" id="cont-pedido" placeholder="Ex: Improcedência total dos pedidos do autor" /></div>
+              <div class="field-wrap"><label>Valor da Causa (atribuído pelo autor)</label><input type="text" id="cont-valor" placeholder="R$ 0,00" /></div>
+            </div>
+          </div>
+          <button class="btn-primary petition-submit">Gerar Contestação →</button>
+        </div>
+
+        <!-- ══ FORM INDENIZAÇÃO ══════════════════════════════ -->
+        <div class="petition-form" id="form-indenizacao">
+          <div class="form-section">
+            <div class="form-section-title">Requerente (Vítima)</div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Nome Completo *</label><input type="text" id="ind-nome" /></div>
+              <div class="field-wrap"><label>CPF *</label><input type="text" id="ind-cpf" maxlength="14" placeholder="000.000.000-00" /></div>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Estado Civil</label>
+                <select id="ind-estado-civil"><option value="">Selecione</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option><option>União estável</option></select>
               </div>
-              <button class="btn-pedido-action" id="btn-add-pedido" type="button">+</button>
-           </div>
-           <div class="field-wrap" style="margin-top: 16px;">
-              <label>Valor Estimado</label>
-              <input type="text" id="t-valor" placeholder="0,00" />
-           </div>
-           <button class="btn-primary" style="margin-top: 20px;" id="btn-gerar-trab">Gerar Inicial →</button>
+              <div class="field-wrap"><label>Profissão</label><input type="text" id="ind-profissao" /></div>
+            </div>
+            <div class="form-row single"><div class="field-wrap"><label>Endereço Completo</label><input type="text" id="ind-endereco" placeholder="Rua, nº, bairro, cidade – UF" /></div></div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Requerido (Causador do Dano)</div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Nome / Razão Social *</label><input type="text" id="ind-requerido" /></div>
+              <div class="field-wrap"><label>Tipo</label>
+                <select id="ind-tipo-parte"><option value="pf">Pessoa Física</option><option value="pj">Pessoa Jurídica</option></select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap"><label>CPF / CNPJ</label><input type="text" id="ind-contra-doc" maxlength="18" /></div>
+              <div class="field-wrap"><label>Endereço</label><input type="text" id="ind-contra-endereco" /></div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Tipo de Dano (marque todos que se aplicam)</div>
+            <div class="checkbox-group" id="ind-danos" style="margin-bottom:16px;">
+              <label class="checkbox-item"><input type="checkbox" value="Dano Material"> Dano Material</label>
+              <label class="checkbox-item"><input type="checkbox" value="Dano Moral"> Dano Moral</label>
+              <label class="checkbox-item"><input type="checkbox" value="Dano Estético"> Dano Estético</label>
+              <label class="checkbox-item"><input type="checkbox" value="Dano à Imagem"> Dano à Imagem</label>
+              <label class="checkbox-item"><input type="checkbox" value="Lucros Cessantes"> Lucros Cessantes</label>
+              <label class="checkbox-item"><input type="checkbox" value="Dano por Morte (arts. 948–951 CC)"> Dano por Morte</label>
+            </div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Valor do Dano Material (R$)</label><input type="text" id="ind-valor-material" placeholder="0,00" /></div>
+              <div class="field-wrap"><label>Valor Pleiteado — Dano Moral (R$)</label><input type="text" id="ind-valor-moral" placeholder="0,00" /></div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Processo e Fatos</div>
+            <div class="form-row single"><div class="field-wrap"><label>Vara / Comarca</label><input type="text" id="ind-vara" placeholder="Ex: 1ª Vara Cível de Porto Alegre" /></div></div>
+            <div class="form-row single"><div class="field-wrap"><label>Fatos e Nexo Causal *</label><textarea id="ind-fatos" rows="5" placeholder="Descreva o ato ilícito, o dano sofrido e a relação de causalidade (arts. 186 e 927 CC)..."></textarea></div></div>
+            <div class="form-row single"><div class="field-wrap"><label>Documentos e Provas Disponíveis</label><textarea id="ind-provas" rows="2" placeholder="Ex: Boletim de ocorrência, laudos médicos, notas fiscais, fotos..."></textarea></div></div>
+            <div class="form-row">
+              <div class="field-wrap"><label>Pedido *</label><input type="text" id="ind-pedido" placeholder="Ex: Condenação ao pagamento de danos morais e materiais" /></div>
+              <div class="field-wrap"><label>Valor Total da Causa (R$)</label><input type="text" id="ind-valor" placeholder="0,00" /></div>
+            </div>
+          </div>
+          <button class="btn-primary petition-submit">Gerar Ação de Indenização →</button>
         </div>
       </section>
 
@@ -294,6 +616,11 @@
 
       <!-- TELA 3: RESULTADO -->
       <section id="screen-result">
+        <div class="usage-banner hidden" id="usage-banner">
+          <span class="usage-banner-text" id="usage-banner-text"></span>
+          <div class="usage-bar-wrap"><div class="usage-bar-fill" id="usage-bar-fill" style="width:0%"></div></div>
+          <span class="usage-upgrade-link hidden" id="usage-upgrade-link">Fazer upgrade</span>
+        </div>
         <h2 id="result-tipo">Petição</h2>
         <div class="result-body" id="result-body"></div>
         <div style="display: flex; gap: 10px;">
@@ -307,6 +634,7 @@
             <button class="chat-tab active" data-tab="refinamento">💬 Refinar</button>
             <button class="chat-tab" data-tab="simulacao">⚔️ Simular Defesa</button>
             <button class="chat-tab" data-tab="revisao">🔍 Revisar</button>
+            <button class="chat-tab" data-tab="diabo">☢️ Adv. do Diabo</button>
           </div>
           <div class="chat-history" id="chat-history"></div>
           <div class="chat-input-row">
@@ -337,26 +665,95 @@
       val = (parseInt(val) / 100).toFixed(2);
       return val.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     };
-    $('campo-cpf').oninput = e => e.target.value = maskCPF(e.target.value);
-    $('t-cpf').oninput = e => e.target.value = maskCPF(e.target.value);
-    $('campo-valor').oninput = e => e.target.value = 'R$ ' + maskValor(e.target.value);
-    $('t-valor').oninput = e => e.target.value = maskValor(e.target.value);
+    const maskCPF_id = id => { const el = $(id); if (el) el.oninput = e => e.target.value = maskCPF(e.target.value); };
+    const maskVal_id = id => { const el = $(id); if (el) el.oninput = e => e.target.value = maskValor(e.target.value); };
+    maskCPF_id('t-cpf'); maskCPF_id('ind-cpf');
+    maskVal_id('t-valor'); maskVal_id('t-salario');
+    maskVal_id('cont-valor'); maskVal_id('ind-valor');
+    maskVal_id('ind-valor-material'); maskVal_id('ind-valor-moral');
   };
 
-  /* ─── TOKEN / SESSÃO ─────────────────────────────────────── */
-  const getToken = async () => {
-    const stored = localStorage.getItem('petipro_tok');
-    if (stored) {
-      try {
-        const { token, trial_until } = JSON.parse(stored);
-        if (trial_until > Date.now() + 60_000) return token;
-      } catch {}
+  /* ─── SUPABASE AUTH ──────────────────────────────────────── */
+  let _sb = null;
+
+  const initSupabase = async () => {
+    if (_sb) return _sb;
+    const cfg = await fetch('/api/config').then(r => r.json());
+    _sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+    return _sb;
+  };
+
+  const getAuthToken = async () => {
+    const sb = await initSupabase();
+    const { data: { session } } = await sb.auth.getSession();
+    return session?.access_token || null;
+  };
+
+  const signOut = async () => {
+    const sb = await initSupabase();
+    await sb.auth.signOut();
+    showAuthModal();
+  };
+
+  /* ─── BILLING STATE ──────────────────────────────────────── */
+  let _me = null;
+
+  const loadMe = async () => {
+    const token = await getAuthToken();
+    if (!token) return null;
+    try {
+      const r = await fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } });
+      if (!r.ok) return null;
+      _me = await r.json();
+      return _me;
+    } catch { return null; }
+  };
+
+  const renderBillingUI = () => {
+    const btn = $('header-plan-btn');
+    if (!btn || !_me) return;
+    const { plan, status, usage } = _me;
+    if (status === 'trialing') {
+      const left = (usage?.limit || 0) - (usage?.used || 0);
+      btn.textContent = `${left} petição${left !== 1 ? 'ões' : ''} grátis`;
+      btn.className = 'plan-pill';
+      btn.style.display = '';
+      btn.onclick = () => openUpgrade(false);
+    } else if (['active', 'past_due'].includes(status)) {
+      const label = { basico: 'Básico', pro: 'Pro', escritorio: 'Escritório' }[plan] || plan;
+      btn.textContent = label;
+      btn.className = 'plan-pill subscriber';
+      btn.style.display = '';
+      btn.onclick = () => openPortal();
     }
-    const resp = await fetch('/api/session', { method: 'POST' });
-    if (!resp.ok) throw new Error('Falha ao iniciar sessão');
-    const data = await resp.json();
-    localStorage.setItem('petipro_tok', JSON.stringify(data));
-    return data.token;
+  };
+
+  const renderUsageBanner = () => {
+    const banner = $('usage-banner');
+    if (!banner || !_me) return;
+    const { plan, status, usage } = _me;
+    const used = usage?.used || 0;
+    const limit = usage?.limit;
+
+    if (status === 'trialing') {
+      banner.className = 'usage-banner trial';
+      banner.classList.remove('hidden');
+      const left = (limit || 0) - used;
+      $('usage-banner-text').textContent = `Trial — ${left} petição${left !== 1 ? 'ões' : ''} restante${left !== 1 ? 's' : ''}`;
+      $('usage-bar-fill').style.width = `${Math.min((used / (limit || 1)) * 100, 100)}%`;
+      $('usage-upgrade-link').classList.remove('hidden');
+      $('usage-upgrade-link').onclick = () => openUpgrade(false);
+    } else if (['active', 'past_due'].includes(status)) {
+      banner.className = 'usage-banner subscriber';
+      banner.classList.remove('hidden');
+      const label = { basico: 'Básico', pro: 'Pro', escritorio: 'Escritório' }[plan] || plan;
+      const limitStr = limit === null ? 'ilimitadas' : `/${limit}`;
+      $('usage-banner-text').textContent = `Plano ${label} — ${used}${limitStr} petições este mês`;
+      $('usage-bar-fill').style.width = limit ? `${Math.min((used / limit) * 100, 100)}%` : '0%';
+      $('usage-upgrade-link').classList.add('hidden');
+    } else {
+      banner.classList.add('hidden');
+    }
   };
 
   /* ─── ERROR BANNER ───────────────────────────────────────── */
@@ -373,6 +770,7 @@
     $('screen-form').style.display = name === 'form' ? 'block' : 'none';
     $('screen-loading').style.display = name === 'loading' ? 'flex' : 'none';
     $('screen-result').style.display = name === 'result' ? 'block' : 'none';
+    if (name === 'result') renderUsageBanner();
   };
 
   /* ─── SSE STREAM READER ──────────────────────────────────── */
@@ -400,9 +798,94 @@
     return { ok: true };
   }
 
+  /* ─── AUTH MODAL ────────────────────────────────────────── */
+  const showAuthModal = () => $('auth-overlay').classList.remove('hidden');
+  const hideAuthModal = () => $('auth-overlay').classList.add('hidden');
+
+  $('auth-btn').onclick = async () => {
+    const email = $('auth-email').value.trim();
+    const msg = $('auth-msg');
+    if (!email || !/.+@.+\..+/.test(email)) {
+      msg.textContent = 'Informe um email válido.';
+      msg.className = 'auth-msg error';
+      return;
+    }
+    $('auth-btn').disabled = true;
+    $('auth-btn').textContent = 'Enviando...';
+    msg.textContent = '';
+    msg.className = 'auth-msg';
+    try {
+      const sb = await initSupabase();
+      const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+      if (error) throw error;
+      msg.textContent = 'Link enviado. Verifique seu email e clique no link para entrar.';
+      $('auth-btn').textContent = 'Email enviado ✓';
+    } catch (e) {
+      msg.textContent = e.message || 'Erro ao enviar email.';
+      msg.className = 'auth-msg error';
+      $('auth-btn').disabled = false;
+      $('auth-btn').textContent = 'Entrar →';
+    }
+  };
+
+  $('auth-email').addEventListener('keydown', e => { if (e.key === 'Enter') $('auth-btn').click(); });
+
+  /* ─── UPGRADE MODAL ─────────────────────────────────────── */
+  const openUpgrade = (expired = false) => {
+    $('upgrade-subtitle').textContent = expired
+      ? 'Seu trial encerrou. Assine para continuar gerando petições.'
+      : 'Continue gerando petições sem interrupção.';
+    $('upgrade-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeUpgrade = () => {
+    $('upgrade-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  $('upgrade-close').addEventListener('click', closeUpgrade);
+  $('upgrade-overlay').addEventListener('click', e => { if (e.target === $('upgrade-overlay')) closeUpgrade(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeUpgrade(); });
+
+  $('upgrade-overlay').addEventListener('click', async e => {
+    const btn = e.target.closest('.plan-btn');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.textContent = 'Redirecionando...';
+    try {
+      const token = await getAuthToken();
+      const r = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ plan: btn.dataset.plan }),
+      });
+      const { url, erro } = await r.json();
+      if (erro) throw new Error(erro);
+      window.location.href = url;
+    } catch (err) {
+      showErro(err.message || 'Erro ao abrir pagamento.');
+      btn.disabled = false;
+      btn.textContent = { basico: 'Assinar Básico', pro: 'Assinar Pro', escritorio: 'Assinar Escritório' }[btn.dataset.plan] || 'Assinar';
+    }
+  });
+
+  const openPortal = async () => {
+    try {
+      const token = await getAuthToken();
+      const r = await fetch('/api/portal', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+      const { url, erro } = await r.json();
+      if (erro) throw new Error(erro);
+      window.location.href = url;
+    } catch (err) {
+      showErro(err.message || 'Erro ao abrir portal.');
+    }
+  };
+
   /* ─── CHAMADA API ────────────────────────────────────────── */
   async function chamarAPI(payload) {
-    const token = await getToken();
+    const token = await getAuthToken();
+    if (!token) { showAuthModal(); throw new Error('Sessão expirada.'); }
     const resp = await fetch('/api/gerar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -410,23 +893,106 @@
     });
     if (!resp.ok) {
       const data = await resp.json().catch(() => ({}));
-      if (resp.status === 401) localStorage.removeItem('petipro_tok');
+      if (resp.status === 401) { signOut(); throw new Error('Sessão expirada.'); }
+      if (resp.status === 402) { openUpgrade(true); throw new Error(data.erro || 'Plano necessário.'); }
       throw new Error(data.erro || `Erro ${resp.status}`);
     }
     return resp;
   }
 
   /* ─── SELEÇÃO DE TIPO ────────────────────────────────────── */
+  const FORM_MAP = {
+    'Inicial Trabalhista': 'form-trabalhista',
+    'Habeas Corpus':       'form-habeas',
+    'Contestação Cível':   'form-contestacao',
+    'Indenização':         'form-indenizacao',
+  };
+
   $('tipos-grid').onclick = e => {
     const card = e.target.closest('.tipo-card');
     if (!card) return;
     document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
     card.classList.add('selected');
     tipoSelecionado = card.dataset.tipo;
-    const isTrab = tipoSelecionado === 'Inicial Trabalhista';
-    $('form-fields').classList.toggle('visible', !isTrab);
-    $('form-trabalhista').classList.toggle('visible', isTrab);
+    document.querySelectorAll('.petition-form').forEach(f => f.classList.remove('visible'));
+    const formId = FORM_MAP[tipoSelecionado];
+    if (formId) $(formId).classList.add('visible');
   };
+
+  /* ─── COLETA DE DADOS POR TIPO ───────────────────────────── */
+  function coletarDados() {
+    const v = id => ($(id)?.value || '').trim();
+    const checks = id => Array.from(document.querySelectorAll(`#${id} input[type=checkbox]:checked`)).map(c => c.value).join(', ');
+
+    if (!tipoSelecionado) { showErro('Selecione o tipo de petição.'); return null; }
+
+    if (tipoSelecionado === 'Inicial Trabalhista') {
+      const peds = Array.from($('t-pedidos-list').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean).join(' | ');
+      if (!v('t-nome'))       { showErro('Informe o nome do reclamante.'); return null; }
+      if (!v('t-fatos'))      { showErro('Descreva os fatos.'); return null; }
+      if (!peds)              { showErro('Adicione ao menos um pedido.'); return null; }
+      return {
+        tipo: tipoSelecionado,
+        nome: v('t-nome'), cpf: v('t-cpf'), rg: v('t-rg'), ctps: v('t-ctps'), pis: v('t-pis'),
+        estadoCivil: v('t-estado-civil'), nacionalidade: v('t-nacionalidade'), enderecoCliente: v('t-endereco'),
+        contra: v('t-reclamado'), tipoParte: v('t-tipo-parte'), contraDoc: v('t-contra-doc'), contraEndereco: v('t-contra-endereco'),
+        vara: v('t-vara'), audienciaConciliacao: v('t-audiencia'),
+        dataAdmissao: v('t-admissao'), dataDemissao: v('t-demissao'),
+        cargo: v('t-cargo'), salario: v('t-salario'), jornada: v('t-jornada'), tipoDesligamento: v('t-desligamento'),
+        fatos: v('t-fatos'), pedido: peds, valor: v('t-valor'),
+      };
+    }
+
+    if (tipoSelecionado === 'Habeas Corpus') {
+      if (!v('hc-nome'))      { showErro('Informe o nome do paciente.'); return null; }
+      if (!v('hc-local'))     { showErro('Informe o local de recolhimento.'); return null; }
+      if (!v('hc-fatos'))     { showErro('Descreva os fatos.'); return null; }
+      if (!v('hc-pedido'))    { showErro('Informe o pedido.'); return null; }
+      return {
+        tipo: tipoSelecionado,
+        nome: v('hc-nome'), cpf: v('hc-cpf'),
+        enderecoCliente: v('hc-local'), numProcesso: v('hc-processo'),
+        contra: v('hc-autoridade'), autoridadeCargo: v('hc-cargo'),
+        vara: v('hc-tribunal'), tipoConstrangimento: v('hc-tipo'),
+        fatos: v('hc-fatos'), pedido: v('hc-pedido'),
+      };
+    }
+
+    if (tipoSelecionado === 'Contestação Cível') {
+      if (!v('cont-nome'))    { showErro('Informe o nome do réu.'); return null; }
+      if (!v('cont-processo')){ showErro('Informe o nº do processo.'); return null; }
+      if (!v('cont-fatos'))   { showErro('Descreva os fatos.'); return null; }
+      if (!v('cont-pedido'))  { showErro('Informe o pedido.'); return null; }
+      return {
+        tipo: tipoSelecionado,
+        nome: v('cont-nome'), cpf: v('cont-doc'),
+        estadoCivil: v('cont-estado-civil'), profissao: v('cont-profissao'), enderecoCliente: v('cont-endereco'),
+        contra: v('cont-autor'), numProcesso: v('cont-processo'), vara: v('cont-vara'),
+        preliminares: checks('cont-prelims'),
+        fatos: v('cont-fatos'), fundamentosJuridicos: v('cont-fundamentos'),
+        pedido: v('cont-pedido'), valor: v('cont-valor'),
+      };
+    }
+
+    if (tipoSelecionado === 'Indenização') {
+      if (!v('ind-nome'))     { showErro('Informe o nome do requerente.'); return null; }
+      if (!v('ind-fatos'))    { showErro('Descreva os fatos.'); return null; }
+      if (!v('ind-pedido'))   { showErro('Informe o pedido.'); return null; }
+      return {
+        tipo: tipoSelecionado,
+        nome: v('ind-nome'), cpf: v('ind-cpf'),
+        estadoCivil: v('ind-estado-civil'), profissao: v('ind-profissao'), enderecoCliente: v('ind-endereco'),
+        tipoParte: v('ind-tipo-parte'), contra: v('ind-requerido'),
+        contraDoc: v('ind-contra-doc'), contraEndereco: v('ind-contra-endereco'),
+        vara: v('ind-vara'), tipoDano: checks('ind-danos'),
+        valorDanoMaterial: v('ind-valor-material'), valorDanoMoral: v('ind-valor-moral'),
+        provasDocumentos: v('ind-provas'),
+        fatos: v('ind-fatos'), pedido: v('ind-pedido'), valor: v('ind-valor'),
+      };
+    }
+
+    return null;
+  }
 
   /* ─── GERAR PETIÇÃO ──────────────────────────────────────── */
   const dispararGeracao = async (dados) => {
@@ -450,34 +1016,26 @@
       textoAtivo = text;
       $('result-body').textContent = text;
       salvarNoHistorico(dadosAtivos, textoAtivo);
+      if (_me?.usage) { _me.usage.used = (_me.usage.used || 0) + 1; }
+      renderUsageBanner();
+      renderBillingUI();
     } catch (e) {
       showErro(e.message || 'Falha técnica. Verifique sua conexão.');
       showScreen('form');
     }
   };
 
-  $('btn-gerar').onclick = () => {
-    const dados = {
-      tipo: tipoSelecionado,
-      nome: $('campo-nome').value,
-      fatos: $('campo-fatos').value,
-      pedido: $('campo-pedido').value,
-      valor: $('campo-valor').value,
-    };
-    dispararGeracao(dados);
-  };
-
-  $('btn-gerar-trab').onclick = () => {
-    const peds = Array.from($('t-pedidos-list').querySelectorAll('input')).map(i => i.value).join(', ');
-    const dados = {
-      tipo: tipoSelecionado,
-      nome: $('t-nome').value,
-      fatos: $('t-fatos').value,
-      pedido: peds,
-      valor: $('t-valor').value,
-    };
-    dispararGeracao(dados);
-  };
+  document.addEventListener('click', e => {
+    if (!e.target.classList.contains('petition-submit')) return;
+    if (_me && _me.status === 'trialing' && (_me.usage?.used || 0) >= (_me.usage?.limit || 0)) {
+      openUpgrade(true); return;
+    }
+    if (_me && !['trialing', 'active', 'past_due'].includes(_me.status)) {
+      openUpgrade(true); return;
+    }
+    const dados = coletarDados();
+    if (dados) dispararGeracao(dados);
+  });
 
   /* ─── CHAT ───────────────────────────────────────────────── */
   const appendMsg = (role, text) => {
@@ -497,16 +1055,20 @@
     chatHistorico = [];
     $('chat-history').innerHTML = '';
     const isRevisar = chatModo === 'revisao';
+    const isDiabo = chatModo === 'diabo';
     $('chat-input').placeholder = isRevisar
-      ? 'Clique em Revisar para analisar a petição...'
-      : (chatModo === 'simulacao' ? 'Faça uma pergunta à defesa...' : 'Peça uma alteração...');
-    $('btn-chat-send').textContent = isRevisar ? 'Revisar' : 'Enviar';
+      ? 'Clique em Analisar para revisar a petição...'
+      : isDiabo
+        ? 'Clique em Atacar ou faça uma pergunta ao Advogado do Diabo...'
+        : (chatModo === 'simulacao' ? 'Faça uma pergunta à defesa...' : 'Peça uma alteração...');
+    $('btn-chat-send').textContent = isRevisar ? 'Revisar' : isDiabo ? 'Atacar' : 'Enviar';
   };
 
   $('btn-chat-send').onclick = async () => {
     const instrucao = $('chat-input').value.trim();
     const isRevisar = chatModo === 'revisao';
-    if (!instrucao && !isRevisar) return;
+    const isDiabo = chatModo === 'diabo';
+    if (!instrucao && !isRevisar && !isDiabo) return;
 
     $('chat-input').value = '';
     $('btn-chat-send').disabled = true;
@@ -519,6 +1081,8 @@
         payload = { modo: 'revisao', peticaoAtual: textoAtivo };
       } else if (chatModo === 'simulacao') {
         payload = { modo: 'simulacao', peticaoAtual: textoAtivo, instrucao: instrucao || '', historico: chatHistorico };
+      } else if (isDiabo) {
+        payload = { modo: 'diabo', peticaoAtual: textoAtivo, instrucao: instrucao || '', historico: chatHistorico };
       } else {
         payload = { modo: 'refinamento', peticaoAtual: textoAtivo, instrucao, historico: chatHistorico };
       }
@@ -535,18 +1099,18 @@
       } else {
         aiMsg.textContent = reply;
         if (!isRevisar) {
-          chatHistorico.push({ role: 'user', content: instrucao });
+          chatHistorico.push({ role: 'user', content: instrucao || '' });
           chatHistorico.push({ role: 'assistant', content: reply });
         }
         if (chatModo === 'refinamento') {
-          const antesM = reply.match(/ANTES:\s*"([\s\S]*?)"\s*\n\nDEPOIS:/);
-          const depoisM = reply.match(/DEPOIS:\s*"([\s\S]*?)"\s*$/);
-          if (antesM && depoisM && textoAtivo.includes(antesM[1])) {
-            textoAtivo = textoAtivo.replace(antesM[1], depoisM[1]);
-            $('result-body').textContent = textoAtivo;
-            let hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
-            if (hist.length > 0) { hist[0].texto = textoAtivo; localStorage.setItem('petipro_h', JSON.stringify(hist)); }
-          }
+          aplicarParesDiff(reply);
+        } else if (chatModo === 'simulacao' || chatModo === 'revisao' || chatModo === 'diabo') {
+          const btn = document.createElement('button');
+          btn.className = 'btn-usar-correcao';
+          btn.textContent = 'Usar para correção';
+          btn.onclick = () => aplicarCorrecao(reply);
+          $('chat-history').appendChild(btn);
+          $('chat-history').scrollTop = $('chat-history').scrollHeight;
         }
       }
     } catch (e) {
@@ -554,6 +1118,60 @@
     }
     $('btn-chat-send').disabled = false;
   };
+
+  /* ─── DIFF ANTES/DEPOIS ─────────────────────────────────── */
+  function aplicarParesDiff(reply) {
+    const regex = /ANTES:\s*"([\s\S]*?)"\s*\n\nDEPOIS:\s*"([\s\S]*?)"\s*(?=\n\nANTES:|$)/g;
+    let match, mudou = false;
+    while ((match = regex.exec(reply)) !== null) {
+      const [, antes, depois] = match;
+      if (textoAtivo.includes(antes)) {
+        textoAtivo = textoAtivo.replace(antes, depois);
+        mudou = true;
+      }
+    }
+    if (mudou) {
+      $('result-body').textContent = textoAtivo;
+      let hist = JSON.parse(localStorage.getItem('petipro_h') || '[]');
+      if (hist.length > 0) { hist[0].texto = textoAtivo; localStorage.setItem('petipro_h', JSON.stringify(hist)); }
+    }
+  }
+
+  async function aplicarCorrecao(analise) {
+    document.querySelectorAll('.chat-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'refinamento'));
+    chatModo = 'refinamento';
+    chatHistorico = [];
+    $('chat-history').innerHTML = '';
+    $('chat-input').placeholder = 'Peça uma alteração...';
+    $('btn-chat-send').textContent = 'Enviar';
+
+    const instrucao = `Aplique as correções identificadas na análise abaixo à petição atual:\n\n${analise}`;
+    appendMsg('user', instrucao);
+    const aiDiv = appendMsg('assistant', '▋');
+    $('btn-chat-send').disabled = true;
+
+    try {
+      const payload = { modo: 'refinamento', peticaoAtual: textoAtivo, instrucao, historico: [] };
+      const resp = await chamarAPI(payload);
+      let reply = '';
+      const { ok, erro } = await readStream(resp, chunk => {
+        reply += chunk;
+        aiDiv.textContent = reply + '▋';
+      });
+
+      if (!ok) {
+        aiDiv.textContent = `Erro: ${erro}`;
+      } else {
+        aiDiv.textContent = reply;
+        chatHistorico.push({ role: 'user', content: instrucao });
+        chatHistorico.push({ role: 'assistant', content: reply });
+        aplicarParesDiff(reply);
+      }
+    } catch (e) {
+      aiDiv.textContent = `Erro: ${e.message}`;
+    }
+    $('btn-chat-send').disabled = false;
+  }
 
   /* ─── BIBLIOTECA ─────────────────────────────────────────── */
   const salvarNoHistorico = (dados, texto) => {
@@ -690,7 +1308,35 @@
   /* ─── INIT ───────────────────────────────────────────────── */
   aplicarMascaras();
   renderizarBiblioteca();
-  getToken().catch(() => {});
+
+  (async () => {
+    const sb = await initSupabase();
+
+    // Supabase lida com o #access_token na URL (magic link callback)
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        if (session) {
+          hideAuthModal();
+          _me = await loadMe();
+          renderBillingUI();
+          // Pós-checkout: polling se voltar com ?checkout=success
+          const params = new URLSearchParams(location.search);
+          if (params.get('checkout') === 'success') {
+            history.replaceState({}, '', location.pathname);
+            for (let i = 0; i < 5; i++) {
+              await new Promise(r => setTimeout(r, 2000));
+              _me = await loadMe();
+              if (_me?.status === 'active' || _me?.plan) { renderBillingUI(); break; }
+            }
+          }
+        } else {
+          showAuthModal();
+        }
+      } else if (event === 'SIGNED_OUT') {
+        showAuthModal();
+      }
+    });
+  })();
 </script>
 </body>
 </html>

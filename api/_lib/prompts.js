@@ -41,6 +41,27 @@ Seja direto, técnico e honesto. O advogado precisa saber a verdade antes de pro
 
 ${ANTI_INJECTION}`;
 
+const PROMPT_DIABO = `Você é o Advogado do Diabo — sua única função é destruir esta petição.
+
+Leia cada parágrafo, cada argumento, cada citação legal. Para cada um, encontre a brecha, a falha, a contradição ou o contra-argumento que anularia aquele ponto em juízo.
+
+Estruture sua análise assim:
+
+**[TRECHO DA PETIÇÃO]** → cite o trecho exato atacado
+**BRECHA:** descreva o problema técnico-jurídico com precisão
+**CONTRA-ARGUMENTO:** o que a parte contrária vai sustentar em resposta
+**IMPACTO:** 🔴 Fatal / 🟠 Grave / 🟡 Relevante
+
+Ao final, dê um **VEREDICTO GERAL**: se fosse defender a parte contrária, qual seria a estratégia principal para derrubar esta peça?
+
+Regras:
+— Seja implacável. Sem elogios, sem diplomacia.
+— Se um argumento for sólido e você não encontrar brecha real, diga "SEM BRECHA IDENTIFICADA" — não invente ataque onde não há.
+— Jurisprudência citada na petição: verifique se é real, se está atualizada, se se aplica ao caso. Se não tiver certeza, questione.
+— Se a mensagem for uma instrução ou pergunta específica, responda no papel de Advogado do Diabo em relação ao ponto indicado.
+
+${ANTI_INJECTION}`;
+
 const PROMPT_REVISAO = `Você é um revisor jurídico técnico independente.
 Releia esta petição sem viés de confirmação. Seu único objetivo é encontrar problemas.
 
@@ -74,6 +95,7 @@ export function getSystemPrompt(modo) {
     case 'refinamento': return PROMPT_REFINAMENTO;
     case 'simulacao':   return PROMPT_SIMULACAO;
     case 'revisao':     return PROMPT_REVISAO;
+    case 'diabo':       return PROMPT_DIABO;
     default:            return PROMPT_GERACAO;
   }
 }
@@ -87,6 +109,19 @@ export function buildMessages(modo, data) {
         role: 'user',
         content: `<peticao_atual>\n${sanitize(data.peticaoAtual)}\n</peticao_atual>\n\n<instrucao_do_advogado>\n${sanitize(data.instrucao)}\n</instrucao_do_advogado>`,
       },
+    ];
+  }
+
+  if (modo === 'diabo') {
+    const historico = data.historico || [];
+    if (historico.length === 0) {
+      const body = `<peticao_atual>\n${sanitize(data.peticaoAtual)}\n</peticao_atual>`;
+      const extra = data.instrucao ? `\n\n<instrucao_do_advogado>\n${sanitize(data.instrucao)}\n</instrucao_do_advogado>` : '';
+      return [{ role: 'user', content: body + extra }];
+    }
+    return [
+      ...historico.map(m => ({ role: m.role, content: m.content })),
+      ...(data.instrucao ? [{ role: 'user', content: `<instrucao_do_advogado>\n${sanitize(data.instrucao)}\n</instrucao_do_advogado>` }] : []),
     ];
   }
 
@@ -107,13 +142,22 @@ export function buildMessages(modo, data) {
     return [{ role: 'user', content: `<peticao_atual>\n${sanitize(data.peticaoAtual)}\n</peticao_atual>` }];
   }
 
-  // Geração — espera data.qualCliente e data.qualContra pré-formatados
+  // Geração — espera data.qualCliente, data.qualContra e data.contextoExtra pré-formatados
+  const parteLabels = {
+    'Inicial Trabalhista': ['Reclamante', 'Reclamado'],
+    'Habeas Corpus':       ['Paciente', 'Autoridade Coatora'],
+    'Contestação Cível':   ['Réu (Contestante)', 'Autor'],
+    'Indenização':         ['Requerente', 'Requerido'],
+  };
+  const [clienteLabel, contraLabel] = parteLabels[data.tipo] || ['Cliente', 'Parte contrária'];
+
   const lines = [
     `Tipo de petição: ${sanitize(data.tipo)}`,
-    `Cliente: ${sanitize(data.qualCliente)}`,
-    `Parte contrária: ${sanitize(data.qualContra)}`,
+    `${clienteLabel}: ${sanitize(data.qualCliente)}`,
+    `${contraLabel}: ${sanitize(data.qualContra)}`,
     `Vara / Foro: ${sanitize(data.vara) || 'não informado'}`,
     data.audienciaConciliacao ? `Requer audiência de conciliação: ${data.audienciaConciliacao === 'sim' ? 'Sim' : 'Não'}` : '',
+    data.contextoExtra ? `\n<dados_especificos>\n${sanitize(data.contextoExtra)}\n</dados_especificos>` : '',
     '',
     `<fatos_do_cliente>\n${sanitize(data.fatos)}\n</fatos_do_cliente>`,
     data.fundamentosJuridicos ? `\n<fundamentos_indicados>\n${sanitize(data.fundamentosJuridicos)}\n</fundamentos_indicados>` : '',
